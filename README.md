@@ -1,6 +1,6 @@
-# 🤖 AllayNPC
-
 <div align="center">
+
+# 🤖 AllayNPC
 
 ![AllayMC](https://img.shields.io/badge/AllayMC-0.22.0-blue?style=for-the-badge)
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge)
