@@ -4,12 +4,14 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.NPCConfig;
+import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.manager.SkinManager;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.form.Forms;
 import org.allaymc.api.form.type.CustomForm;
 import org.allaymc.api.form.type.SimpleForm;
+import org.allaymc.api.message.I18n;
 import org.allaymc.api.player.Player;
 import org.allaymc.api.utils.TextFormat;
 
@@ -47,14 +49,14 @@ public class NPCFormHandler {
         skinList.addAll(skinManager.getSkinNames());
 
         CustomForm form = Forms.custom()
-                .title("Create NPC: " + npcName)
-                .input("Display Name", "Enter display name...", npcName)
-                .toggle("Always Show Name", true)
-                .dropdown("Skin", skinList, 0)
-                .toggle("Look at Player", true)
-                .input("Held Item ID", "e.g. minecraft:diamond_sword", "")
-                .input("Click Cooldown (ticks)", "20", "20")
-                .label("Position will be set to your current location")
+                .title(I18n.get().tr(I18nKeys.FORM_CREATE_TITLE, npcName))
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_DISPLAYNAME), I18n.get().tr(I18nKeys.FORM_CREATE_DISPLAYNAME_PLACEHOLDER), npcName)
+                .toggle(I18n.get().tr(I18nKeys.FORM_CREATE_ALWAYSSHOWNAME), true)
+                .dropdown(I18n.get().tr(I18nKeys.FORM_CREATE_SKIN), skinList, 0)
+                .toggle(I18n.get().tr(I18nKeys.FORM_CREATE_LOOKATPLAYER), true)
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_HELDITEM), I18n.get().tr(I18nKeys.FORM_CREATE_HELDITEM_PLACEHOLDER), "")
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_COOLDOWN), "20", "20")
+                .label(I18n.get().tr(I18nKeys.FORM_CREATE_POSITION_LABEL))
                 .onResponse(responses -> {
                     // Parse form response safely
                     String displayName = responses.get(0);
@@ -93,9 +95,9 @@ public class NPCFormHandler {
                     npcManager.saveNPCConfig(config);
 
                     if (npcManager.spawnNPC(npcName)) {
-                        player.sendMessage(TextFormat.GREEN + "NPC '" + npcName + "' created successfully!");
+                        player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_CREATE_SUCCESS, npcName));
                     } else {
-                        player.sendMessage(TextFormat.RED + "NPC created but failed to spawn. Check server logs.");
+                        player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.FORM_CREATE_SPAWN_FAILED));
                     }
                 });
 
@@ -118,20 +120,20 @@ public class NPCFormHandler {
         NPCConfig config = npcManager.getNPCConfig(npcName);
 
         if (config == null) {
-            player.sendMessage(TextFormat.RED + "NPC not found!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.FORM_EDIT_NOTFOUND));
             return;
         }
 
         // Show edit options menu
         SimpleForm menuForm = Forms.simple()
-                .title("Edit NPC: " + npcName)
-                .content("Select what you want to edit:");
+                .title(I18n.get().tr(I18nKeys.FORM_EDIT_TITLE, npcName))
+                .content(I18n.get().tr(I18nKeys.FORM_EDIT_CONTENT));
 
-        menuForm.button("Basic Settings").onClick(btn -> openBasicSettingsForm(player, npcName));
-        menuForm.button("Position").onClick(btn -> openPositionForm(player, npcName));
-        menuForm.button("Armor").onClick(btn -> openArmorForm(player, npcName));
-        menuForm.button("Emote").onClick(btn -> openEmoteForm(player, npcName));
-        menuForm.button("Actions").onClick(btn -> openActionsMenuForm(player, npcName));
+        menuForm.button(I18n.get().tr(I18nKeys.FORM_EDIT_BASIC)).onClick(btn -> openBasicSettingsForm(player, npcName));
+        menuForm.button(I18n.get().tr(I18nKeys.FORM_EDIT_POSITION)).onClick(btn -> openPositionForm(player, npcName));
+        menuForm.button(I18n.get().tr(I18nKeys.FORM_EDIT_ARMOR)).onClick(btn -> openArmorForm(player, npcName));
+        menuForm.button(I18n.get().tr(I18nKeys.FORM_EDIT_EMOTE)).onClick(btn -> openEmoteForm(player, npcName));
+        menuForm.button(I18n.get().tr(I18nKeys.FORM_EDIT_ACTIONS)).onClick(btn -> openActionsMenuForm(player, npcName));
 
         actualPlayer.viewForm(menuForm);
     }
@@ -161,13 +163,13 @@ public class NPCFormHandler {
         }
 
         CustomForm form = Forms.custom()
-                .title("Edit Basic Settings: " + npcName)
-                .input("Display Name", "Enter display name...", config.getDisplayName())
-                .toggle("Always Show Name", config.isAlwaysShowName())
-                .dropdown("Skin", skinList, currentSkinIndex)
-                .toggle("Look at Player", config.isLookAtPlayer())
-                .input("Held Item ID", "e.g. minecraft:diamond_sword", config.getHeldItem())
-                .input("Click Cooldown (ticks)", "20", String.valueOf(config.getClickCooldown()))
+                .title(I18n.get().tr(I18nKeys.FORM_BASIC_TITLE, npcName))
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_DISPLAYNAME), I18n.get().tr(I18nKeys.FORM_CREATE_DISPLAYNAME_PLACEHOLDER), config.getDisplayName())
+                .toggle(I18n.get().tr(I18nKeys.FORM_CREATE_ALWAYSSHOWNAME), config.isAlwaysShowName())
+                .dropdown(I18n.get().tr(I18nKeys.FORM_CREATE_SKIN), skinList, currentSkinIndex)
+                .toggle(I18n.get().tr(I18nKeys.FORM_CREATE_LOOKATPLAYER), config.isLookAtPlayer())
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_HELDITEM), I18n.get().tr(I18nKeys.FORM_CREATE_HELDITEM_PLACEHOLDER), config.getHeldItem())
+                .input(I18n.get().tr(I18nKeys.FORM_CREATE_COOLDOWN), "20", String.valueOf(config.getClickCooldown()))
                 .onResponse(responses -> {
                     String displayName = responses.get(0);
                     boolean alwaysShowName = parseBoolean(responses.get(1), config.isAlwaysShowName());
@@ -192,7 +194,7 @@ public class NPCFormHandler {
                     npcManager.removeNPC(npcName);
                     npcManager.spawnNPC(npcName);
 
-                    player.sendMessage(TextFormat.GREEN + "Basic settings updated!");
+                    player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_BASIC_UPDATED));
                 });
 
         actualPlayer.viewForm(form);
@@ -213,11 +215,12 @@ public class NPCFormHandler {
         var pos = config.getPosition();
 
         SimpleForm form = Forms.simple()
-                .title("Edit Position: " + npcName)
-                .content(String.format("Current Position:\nWorld: %s\nX: %.2f, Y: %.2f, Z: %.2f\nYaw: %.2f, Pitch: %.2f",
-                        pos.getWorld(), pos.getX(), pos.getY(), pos.getZ(), pos.getYaw(), pos.getPitch()));
+                .title(I18n.get().tr(I18nKeys.FORM_POSITION_TITLE, npcName))
+                .content(I18n.get().tr(I18nKeys.FORM_POSITION_CURRENT,
+                        pos.getWorld(), String.format("%.2f", pos.getX()), String.format("%.2f", pos.getY()),
+                        String.format("%.2f", pos.getZ()), String.format("%.2f", pos.getYaw()), String.format("%.2f", pos.getPitch())));
 
-        form.button("Set to My Position").onClick(btn -> {
+        form.button(I18n.get().tr(I18nKeys.FORM_POSITION_SETTOMINE)).onClick(btn -> {
             var loc = player.getLocation();
             pos.setWorld(loc.dimension().getWorld().getName());
             pos.setX(loc.x());
@@ -230,10 +233,10 @@ public class NPCFormHandler {
             npcManager.removeNPC(npcName);
             npcManager.spawnNPC(npcName);
 
-            player.sendMessage(TextFormat.GREEN + "Position updated to your location!");
+            player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_POSITION_UPDATED));
         });
 
-        form.button("Cancel").onClick(btn -> {});
+        form.button(I18n.get().tr(I18nKeys.FORM_POSITION_CANCEL)).onClick(btn -> {});
 
         actualPlayer.viewForm(form);
     }
@@ -259,11 +262,11 @@ public class NPCFormHandler {
         final var finalArmor = armor;
 
         CustomForm form = Forms.custom()
-                .title("Edit Armor: " + npcName)
-                .input("Helmet", "e.g. minecraft:diamond_helmet", armor.getHelmet())
-                .input("Chestplate", "e.g. minecraft:diamond_chestplate", armor.getChestplate())
-                .input("Leggings", "e.g. minecraft:diamond_leggings", armor.getLeggings())
-                .input("Boots", "e.g. minecraft:diamond_boots", armor.getBoots())
+                .title(I18n.get().tr(I18nKeys.FORM_ARMOR_TITLE, npcName))
+                .input(I18n.get().tr(I18nKeys.FORM_ARMOR_HELMET), I18n.get().tr(I18nKeys.FORM_ARMOR_HELMET_PLACEHOLDER), armor.getHelmet())
+                .input(I18n.get().tr(I18nKeys.FORM_ARMOR_CHESTPLATE), I18n.get().tr(I18nKeys.FORM_ARMOR_CHESTPLATE_PLACEHOLDER), armor.getChestplate())
+                .input(I18n.get().tr(I18nKeys.FORM_ARMOR_LEGGINGS), I18n.get().tr(I18nKeys.FORM_ARMOR_LEGGINGS_PLACEHOLDER), armor.getLeggings())
+                .input(I18n.get().tr(I18nKeys.FORM_ARMOR_BOOTS), I18n.get().tr(I18nKeys.FORM_ARMOR_BOOTS_PLACEHOLDER), armor.getBoots())
                 .onResponse(responses -> {
                     finalArmor.setHelmet(responses.get(0));
                     finalArmor.setChestplate(responses.get(1));
@@ -274,7 +277,7 @@ public class NPCFormHandler {
                     npcManager.removeNPC(npcName);
                     npcManager.spawnNPC(npcName);
 
-                    player.sendMessage(TextFormat.GREEN + "Armor settings updated!");
+                    player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_ARMOR_UPDATED));
                 });
 
         actualPlayer.viewForm(form);
@@ -301,16 +304,16 @@ public class NPCFormHandler {
         final var finalEmote = emote;
 
         CustomForm form = Forms.custom()
-                .title("Edit Emote: " + npcName)
-                .input("Emote UUID", "e.g. 4c8ae710-df2e-47cd-814d-cc7bf21a3d67", emote.getId())
-                .input("Interval (ticks)", "100", String.valueOf(emote.getInterval()))
-                .label("Leave UUID empty to disable emotes")
+                .title(I18n.get().tr(I18nKeys.FORM_EMOTE_TITLE, npcName))
+                .input(I18n.get().tr(I18nKeys.FORM_EMOTE_UUID), I18n.get().tr(I18nKeys.FORM_EMOTE_UUID_PLACEHOLDER), emote.getId())
+                .input(I18n.get().tr(I18nKeys.FORM_EMOTE_INTERVAL), "100", String.valueOf(emote.getInterval()))
+                .label(I18n.get().tr(I18nKeys.FORM_EMOTE_LABEL))
                 .onResponse(responses -> {
                     finalEmote.setId(responses.get(0));
                     finalEmote.setInterval(parseInt(responses.get(1), finalEmote.getInterval()));
 
                     npcManager.saveNPCConfig(config);
-                    player.sendMessage(TextFormat.GREEN + "Emote settings updated!");
+                    player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_EMOTE_UPDATED));
                 });
 
         actualPlayer.viewForm(form);
@@ -335,8 +338,8 @@ public class NPCFormHandler {
         }
 
         SimpleForm formBuilder = Forms.simple()
-                .title("Edit Actions: " + npcName)
-                .content("Current actions: " + actions.size());
+                .title(I18n.get().tr(I18nKeys.FORM_ACTIONS_TITLE, npcName))
+                .content(I18n.get().tr(I18nKeys.FORM_ACTIONS_CONTENT, actions.size()));
 
         // Add buttons for existing actions
         for (int i = 0; i < actions.size(); i++) {
@@ -347,7 +350,7 @@ public class NPCFormHandler {
         }
 
         // Add new action button
-        formBuilder.button(TextFormat.GREEN + "+ Add Action").onClick(btn -> openAddActionForm(player, npcName));
+        formBuilder.button(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_ACTIONS_ADD)).onClick(btn -> openAddActionForm(player, npcName));
 
         actualPlayer.viewForm(formBuilder);
     }
@@ -367,10 +370,10 @@ public class NPCFormHandler {
         List<String> actionTypes = List.of("COMMAND", "MESSAGE", "DIALOG");
 
         CustomForm form = Forms.custom()
-                .title("Add Action: " + npcName)
-                .dropdown("Action Type", actionTypes, 0)
-                .input("Value", "Command/Message/Dialog name", "")
-                .toggle("Execute as Player (for commands)", false)
+                .title(I18n.get().tr(I18nKeys.FORM_ACTION_ADD_TITLE, npcName))
+                .dropdown(I18n.get().tr(I18nKeys.FORM_ACTION_TYPE), actionTypes, 0)
+                .input(I18n.get().tr(I18nKeys.FORM_ACTION_VALUE), I18n.get().tr(I18nKeys.FORM_ACTION_VALUE_PLACEHOLDER), "")
+                .toggle(I18n.get().tr(I18nKeys.FORM_ACTION_ASPLAYER), false)
                 .onResponse(responses -> {
                     int typeIndex = parseInt(responses.get(0), 0);
                     if (typeIndex < 0 || typeIndex >= actionTypes.size()) typeIndex = 0;
@@ -390,7 +393,7 @@ public class NPCFormHandler {
                     config.getActions().add(action);
 
                     npcManager.saveNPCConfig(config);
-                    player.sendMessage(TextFormat.GREEN + "Action added!");
+                    player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_ACTIONS_ADDED));
 
                     // Return to actions menu
                     openActionsMenuForm(player, npcName);
@@ -414,20 +417,19 @@ public class NPCFormHandler {
         NPCConfig.ActionConfig action = config.getActions().get(actionIndex);
 
         SimpleForm form = Forms.simple()
-                .title("Edit Action #" + (actionIndex + 1))
-                .content(String.format("Type: %s\nValue: %s\nAs Player: %s",
-                        action.getType(), action.getValue(), action.isAsPlayer()));
+                .title(I18n.get().tr(I18nKeys.FORM_ACTION_EDIT_TITLE, actionIndex + 1))
+                .content(I18n.get().tr(I18nKeys.FORM_ACTION_CONTENT, action.getType(), action.getValue(), action.isAsPlayer()));
 
-        form.button("Edit").onClick(btn -> openActionEditDetailForm(player, npcName, actionIndex));
+        form.button(I18n.get().tr(I18nKeys.FORM_ACTION_EDIT)).onClick(btn -> openActionEditDetailForm(player, npcName, actionIndex));
 
-        form.button(TextFormat.RED + "Delete").onClick(btn -> {
+        form.button(TextFormat.RED + I18n.get().tr(I18nKeys.FORM_ACTION_DELETE)).onClick(btn -> {
             config.getActions().remove(actionIndex);
             npcManager.saveNPCConfig(config);
-            player.sendMessage(TextFormat.GREEN + "Action deleted!");
+            player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_ACTIONS_DELETED));
             openActionsMenuForm(player, npcName);
         });
 
-        form.button("Back").onClick(btn -> openActionsMenuForm(player, npcName));
+        form.button(I18n.get().tr(I18nKeys.FORM_ACTION_BACK)).onClick(btn -> openActionsMenuForm(player, npcName));
 
         actualPlayer.viewForm(form);
     }
@@ -451,10 +453,10 @@ public class NPCFormHandler {
         if (currentTypeIndex < 0) currentTypeIndex = 0;
 
         CustomForm form = Forms.custom()
-                .title("Edit Action #" + (actionIndex + 1))
-                .dropdown("Action Type", actionTypes, currentTypeIndex)
-                .input("Value", "Command/Message/Dialog name", action.getValue())
-                .toggle("Execute as Player (for commands)", action.isAsPlayer())
+                .title(I18n.get().tr(I18nKeys.FORM_ACTION_EDIT_TITLE, actionIndex + 1))
+                .dropdown(I18n.get().tr(I18nKeys.FORM_ACTION_TYPE), actionTypes, currentTypeIndex)
+                .input(I18n.get().tr(I18nKeys.FORM_ACTION_VALUE), I18n.get().tr(I18nKeys.FORM_ACTION_VALUE_PLACEHOLDER), action.getValue())
+                .toggle(I18n.get().tr(I18nKeys.FORM_ACTION_ASPLAYER), action.isAsPlayer())
                 .onResponse(responses -> {
                     int typeIndex = parseInt(responses.get(0), 0);
                     if (typeIndex < 0 || typeIndex >= actionTypes.size()) typeIndex = 0;
@@ -466,7 +468,7 @@ public class NPCFormHandler {
                     action.setAsPlayer(asPlayer);
 
                     npcManager.saveNPCConfig(config);
-                    player.sendMessage(TextFormat.GREEN + "Action updated!");
+                    player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.FORM_ACTIONS_UPDATED));
                     openActionsMenuForm(player, npcName);
                 });
 

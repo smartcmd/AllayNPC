@@ -3,6 +3,7 @@ package me.daoge.allaynpc.command;
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.NPCConfig;
 import me.daoge.allaynpc.form.NPCFormHandler;
+import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.npc.NPC;
 import org.allaymc.api.command.Command;
@@ -11,6 +12,7 @@ import org.allaymc.api.command.SenderType;
 import org.allaymc.api.command.tree.CommandContext;
 import org.allaymc.api.command.tree.CommandTree;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
+import org.allaymc.api.message.I18n;
 import org.allaymc.api.utils.TextFormat;
 
 import java.util.Set;
@@ -24,7 +26,7 @@ import java.util.Set;
 public class ANPCCommand extends Command {
 
     public ANPCCommand() {
-        super("anpc", "AllayNPC management command", "allaynpc.command");
+        super("anpc", I18nKeys.COMMAND_DESCRIPTION, "allaynpc.command");
         aliases.add("npc");
     }
 
@@ -113,7 +115,7 @@ public class ANPCCommand extends Command {
 
         // Check if NPC already exists
         if (npcManager.hasNPC(name)) {
-            player.sendMessage(TextFormat.RED + "NPC '" + name + "' already exists!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_EXISTS, name));
             return ctx.fail();
         }
 
@@ -130,7 +132,7 @@ public class ANPCCommand extends Command {
 
         // Check if NPC exists
         if (!npcManager.hasNPC(name)) {
-            player.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_NOTFOUND, name));
             return ctx.fail();
         }
 
@@ -148,7 +150,7 @@ public class ANPCCommand extends Command {
 
         // Check if NPC exists
         if (!npcManager.hasNPC(name)) {
-            sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
+            sender.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_NOTFOUND, name));
             return ctx.fail();
         }
 
@@ -157,10 +159,10 @@ public class ANPCCommand extends Command {
 
         // Delete config file
         if (npcManager.deleteNPCConfig(name)) {
-            sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been deleted!");
+            sender.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.COMMAND_NPC_DELETED, name));
             return ctx.success();
         } else {
-            sender.sendMessage(TextFormat.RED + "Failed to delete NPC config file!");
+            sender.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_DELETE_FAILED));
             return ctx.fail();
         }
     }
@@ -174,12 +176,12 @@ public class ANPCCommand extends Command {
         Set<String> npcNames = npcManager.getNPCNames();
 
         if (npcNames.isEmpty()) {
-            sender.sendMessage(TextFormat.YELLOW + "No NPCs found.");
+            sender.sendMessage(TextFormat.YELLOW + I18n.get().tr(I18nKeys.COMMAND_LIST_EMPTY));
             return ctx.success();
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(TextFormat.GREEN).append("NPCs (").append(npcNames.size()).append("):\n");
+        sb.append(TextFormat.GREEN).append(I18n.get().tr(I18nKeys.COMMAND_LIST_HEADER, npcNames.size())).append("\n");
 
         for (String name : npcNames) {
             NPCConfig config = npcManager.getNPCConfig(name);
@@ -190,7 +192,7 @@ public class ANPCCommand extends Command {
             if (config != null && config.getPosition() != null) {
                 sb.append(TextFormat.GRAY).append(" @ ").append(config.getPosition().getWorld());
             }
-            sb.append(spawned ? TextFormat.GREEN + " [Spawned]" : TextFormat.RED + " [Not Spawned]");
+            sb.append(spawned ? TextFormat.GREEN + " " + I18n.get().tr(I18nKeys.COMMAND_LIST_SPAWNED) : TextFormat.RED + " " + I18n.get().tr(I18nKeys.COMMAND_LIST_NOTSPAWNED));
             sb.append("\n");
         }
 
@@ -206,7 +208,7 @@ public class ANPCCommand extends Command {
         NPCConfig config = npcManager.getNPCConfig(name);
 
         if (config == null || config.getPosition() == null) {
-            player.sendMessage(TextFormat.RED + "NPC '" + name + "' not found or has no position!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_NOPOSITION, name));
             return ctx.fail();
         }
 
@@ -215,13 +217,13 @@ public class ANPCCommand extends Command {
         // Get NPC's world and dimension
         var world = org.allaymc.api.server.Server.getInstance().getWorldPool().getWorld(pos.getWorld());
         if (world == null) {
-            player.sendMessage(TextFormat.RED + "World '" + pos.getWorld() + "' not found!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_WORLD_NOTFOUND, pos.getWorld()));
             return ctx.fail();
         }
 
         var dimension = world.getOverWorld();
         if (dimension == null) {
-            player.sendMessage(TextFormat.RED + "Dimension not found!");
+            player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_DIMENSION_NOTFOUND));
             return ctx.fail();
         }
 
@@ -231,7 +233,7 @@ public class ANPCCommand extends Command {
                 dimension
         );
         player.teleport(targetLoc);
-        player.sendMessage(TextFormat.GREEN + "Teleported to NPC '" + name + "'!");
+        player.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.COMMAND_TELEPORTED, name));
         return ctx.success();
     }
 
@@ -240,7 +242,7 @@ public class ANPCCommand extends Command {
      */
     private CommandResult handleReload(CommandContext ctx) {
         AllayNPC.getInstance().reload();
-        ctx.getSender().sendMessage(TextFormat.GREEN + "AllayNPC reloaded!");
+        ctx.getSender().sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.COMMAND_RELOADED));
         return ctx.success();
     }
 
@@ -253,12 +255,12 @@ public class ANPCCommand extends Command {
         Set<String> skinNames = skinManager.getSkinNames();
 
         if (skinNames.isEmpty()) {
-            sender.sendMessage(TextFormat.YELLOW + "No skins found.");
+            sender.sendMessage(TextFormat.YELLOW + I18n.get().tr(I18nKeys.COMMAND_SKINS_EMPTY));
             return ctx.success();
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(TextFormat.GREEN).append("Available Skins (").append(skinNames.size()).append("):\n");
+        sb.append(TextFormat.GREEN).append(I18n.get().tr(I18nKeys.COMMAND_SKINS_HEADER, skinNames.size())).append("\n");
 
         for (String name : skinNames) {
             sb.append(TextFormat.GRAY).append("- ").append(TextFormat.WHITE).append(name).append("\n");
@@ -276,15 +278,15 @@ public class ANPCCommand extends Command {
         var sender = ctx.getSender();
 
         if (!npcManager.hasNPC(name)) {
-            sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
+            sender.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_NOTFOUND, name));
             return ctx.fail();
         }
 
         if (npcManager.spawnNPC(name)) {
-            sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been spawned!");
+            sender.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.COMMAND_NPC_SPAWNED, name));
             return ctx.success();
         } else {
-            sender.sendMessage(TextFormat.RED + "Failed to spawn NPC '" + name + "'!");
+            sender.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_SPAWN_FAILED, name));
             return ctx.fail();
         }
     }
@@ -297,12 +299,12 @@ public class ANPCCommand extends Command {
         var sender = ctx.getSender();
 
         if (!npcManager.hasNPC(name)) {
-            sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
+            sender.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.COMMAND_NPC_NOTFOUND, name));
             return ctx.fail();
         }
 
         npcManager.removeNPC(name);
-        sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been removed!");
+        sender.sendMessage(TextFormat.GREEN + I18n.get().tr(I18nKeys.COMMAND_NPC_REMOVED, name));
         return ctx.success();
     }
 
@@ -311,16 +313,16 @@ public class ANPCCommand extends Command {
      */
     private CommandResult handleHelp(CommandContext ctx) {
         StringBuilder sb = new StringBuilder();
-        sb.append(TextFormat.GREEN).append("=== AllayNPC Commands ===\n");
-        sb.append(TextFormat.YELLOW).append("/anpc create <name>").append(TextFormat.WHITE).append(" - Create a new NPC\n");
-        sb.append(TextFormat.YELLOW).append("/anpc edit <name>").append(TextFormat.WHITE).append(" - Edit an existing NPC\n");
-        sb.append(TextFormat.YELLOW).append("/anpc delete <name>").append(TextFormat.WHITE).append(" - Delete an NPC\n");
-        sb.append(TextFormat.YELLOW).append("/anpc list").append(TextFormat.WHITE).append(" - List all NPCs\n");
-        sb.append(TextFormat.YELLOW).append("/anpc tp <name>").append(TextFormat.WHITE).append(" - Teleport to an NPC\n");
-        sb.append(TextFormat.YELLOW).append("/anpc spawn <name>").append(TextFormat.WHITE).append(" - Spawn an NPC\n");
-        sb.append(TextFormat.YELLOW).append("/anpc remove <name>").append(TextFormat.WHITE).append(" - Remove an NPC entity\n");
-        sb.append(TextFormat.YELLOW).append("/anpc skins").append(TextFormat.WHITE).append(" - List available skins\n");
-        sb.append(TextFormat.YELLOW).append("/anpc reload").append(TextFormat.WHITE).append(" - Reload configuration\n");
+        sb.append(TextFormat.GREEN).append(I18n.get().tr(I18nKeys.COMMAND_HELP_TITLE)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_CREATE)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_EDIT)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_DELETE)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_LIST)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_TP)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_SPAWN)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_REMOVE)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_SKINS)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18n.get().tr(I18nKeys.COMMAND_HELP_RELOAD)).append("\n");
 
         ctx.getSender().sendMessage(sb.toString());
         return ctx.success();

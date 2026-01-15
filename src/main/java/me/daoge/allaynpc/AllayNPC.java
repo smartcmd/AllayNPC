@@ -3,11 +3,13 @@ package me.daoge.allaynpc;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.command.ANPCCommand;
+import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.listener.NPCEventListener;
 import me.daoge.allaynpc.manager.DialogManager;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.manager.SkinManager;
 import me.daoge.allaynpc.npc.NPC;
+import org.allaymc.api.message.I18n;
 import org.allaymc.api.plugin.Plugin;
 import org.allaymc.api.registry.Registries;
 import org.allaymc.api.server.Server;
@@ -53,7 +55,7 @@ public class AllayNPC extends Plugin {
     @Override
     public void onLoad() {
         instance = this;
-        log.info("AllayNPC is loading...");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_LOADING));
 
         // Create data directory structure
         createDataDirectories();
@@ -61,7 +63,7 @@ public class AllayNPC extends Plugin {
 
     @Override
     public void onEnable() {
-        log.info("AllayNPC is enabling...");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_ENABLING));
 
         // Initialize managers
         initManagers();
@@ -75,19 +77,19 @@ public class AllayNPC extends Plugin {
         // Start NPC update task
         startNPCUpdateTask();
 
-        log.info("AllayNPC has been enabled successfully!");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_ENABLED));
     }
 
     @Override
     public void onDisable() {
-        log.info("AllayNPC is disabling...");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_DISABLING));
 
         // Remove all NPCs
         if (npcManager != null) {
             npcManager.removeAllNPCs();
         }
 
-        log.info("AllayNPC has been disabled!");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_DISABLED));
     }
 
     /**
@@ -101,32 +103,32 @@ public class AllayNPC extends Plugin {
             Path skinsDir = dataFolder.resolve("skins");
             if (!Files.exists(skinsDir)) {
                 Files.createDirectories(skinsDir);
-                log.info("Created skins directory");
+                log.info(I18n.get().tr(I18nKeys.DIRECTORY_SKINS_CREATED));
             }
 
             // Create dialogs directory
             Path dialogsDir = dataFolder.resolve("dialogs");
             if (!Files.exists(dialogsDir)) {
                 Files.createDirectories(dialogsDir);
-                log.info("Created dialogs directory");
+                log.info(I18n.get().tr(I18nKeys.DIRECTORY_DIALOGS_CREATED));
             }
 
             // Create npcs directory
             Path npcsDir = dataFolder.resolve("npcs");
             if (!Files.exists(npcsDir)) {
                 Files.createDirectories(npcsDir);
-                log.info("Created npcs directory");
+                log.info(I18n.get().tr(I18nKeys.DIRECTORY_NPCS_CREATED));
             }
 
             // Create lang directory
             Path langDir = dataFolder.resolve("lang");
             if (!Files.exists(langDir)) {
                 Files.createDirectories(langDir);
-                log.info("Created lang directory");
+                log.info(I18n.get().tr(I18nKeys.DIRECTORY_LANG_CREATED));
             }
 
         } catch (IOException e) {
-            log.error("Failed to create data directories", e);
+            log.error(I18n.get().tr(I18nKeys.DIRECTORY_CREATE_FAILED), e);
         }
     }
 
@@ -139,17 +141,17 @@ public class AllayNPC extends Plugin {
         // Initialize skin manager
         skinManager = new SkinManager(dataFolder.resolve("skins"));
         skinManager.loadAllSkins();
-        log.info("Loaded {} skins", skinManager.getSkinCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_SKINS_LOADED, skinManager.getSkinCount()));
 
         // Initialize dialog manager
         dialogManager = new DialogManager(dataFolder.resolve("dialogs"));
         dialogManager.loadAllDialogs();
-        log.info("Loaded {} dialogs", dialogManager.getDialogCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_DIALOGS_LOADED, dialogManager.getDialogCount()));
 
         // Initialize NPC manager
         npcManager = new NPCManager(dataFolder.resolve("npcs"));
         npcManager.loadAllNPCConfigs();
-        log.info("Loaded {} NPC configs", npcManager.getNPCConfigCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_NPCS_LOADED, npcManager.getNPCConfigCount()));
     }
 
     /**
@@ -157,7 +159,7 @@ public class AllayNPC extends Plugin {
      */
     private void registerCommands() {
         Registries.COMMANDS.register(new ANPCCommand());
-        log.info("Registered /anpc command");
+        log.info(I18n.get().tr(I18nKeys.COMMAND_REGISTERED));
     }
 
     /**
@@ -166,7 +168,7 @@ public class AllayNPC extends Plugin {
     private void registerEventListeners() {
         eventListener = new NPCEventListener();
         Server.getInstance().getEventBus().registerListener(eventListener);
-        log.info("Registered event listeners");
+        log.info(I18n.get().tr(I18nKeys.EVENT_REGISTERED));
     }
 
     /**
@@ -178,7 +180,7 @@ public class AllayNPC extends Plugin {
             updateNPCs();
         }, NPC_UPDATE_INTERVAL);
 
-        log.info("Started NPC update task (interval: {} ticks)", NPC_UPDATE_INTERVAL);
+        log.info(I18n.get().tr(I18nKeys.TASK_STARTED, NPC_UPDATE_INTERVAL));
     }
 
     /**
@@ -195,7 +197,7 @@ public class AllayNPC extends Plugin {
                     npc.playEmote();
                 }
             } catch (Exception e) {
-                log.warn("Error updating NPC {}: {}", npc.getName(), e.getMessage());
+                log.warn(I18n.get().tr(I18nKeys.NPC_UPDATE_ERROR, npc.getName(), e.getMessage()));
             }
         }
 
@@ -209,26 +211,26 @@ public class AllayNPC extends Plugin {
      * Reload plugin configuration
      */
     public void reload() {
-        log.info("Reloading AllayNPC...");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_RELOADING));
 
         // Remove all NPCs
         npcManager.removeAllNPCs();
 
         // Reload skins
         skinManager.loadAllSkins();
-        log.info("Reloaded {} skins", skinManager.getSkinCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_SKINS_RELOADED, skinManager.getSkinCount()));
 
         // Reload dialogs
         dialogManager.loadAllDialogs();
-        log.info("Reloaded {} dialogs", dialogManager.getDialogCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_DIALOGS_RELOADED, dialogManager.getDialogCount()));
 
         // Reload NPC configs
         npcManager.loadAllNPCConfigs();
-        log.info("Reloaded {} NPC configs", npcManager.getNPCConfigCount());
+        log.info(I18n.get().tr(I18nKeys.MANAGER_NPCS_RELOADED, npcManager.getNPCConfigCount()));
 
         // Respawn all NPCs
         npcManager.spawnAllNPCs();
 
-        log.info("AllayNPC reloaded successfully!");
+        log.info(I18n.get().tr(I18nKeys.PLUGIN_RELOADED));
     }
 }
