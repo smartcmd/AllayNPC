@@ -77,6 +77,9 @@ public class AllayNPC extends Plugin {
         // Start NPC update task
         startNPCUpdateTask();
 
+        // Spawn NPCs for already loaded worlds
+        spawnNPCsForLoadedWorlds();
+
         log.info(I18n.get().tr(I18nKeys.PLUGIN_ENABLED));
     }
 
@@ -181,6 +184,16 @@ public class AllayNPC extends Plugin {
         }, NPC_UPDATE_INTERVAL);
 
         log.info(I18n.get().tr(I18nKeys.TASK_STARTED, NPC_UPDATE_INTERVAL));
+    }
+
+    /**
+     * Spawn NPCs for all already loaded worlds
+     * This is called during plugin enable to handle worlds that were loaded before the plugin
+     */
+    private void spawnNPCsForLoadedWorlds() {
+        for (var world : Server.getInstance().getWorldPool().getWorlds().values()) {
+            npcManager.onWorldLoad(world.getName());
+        }
     }
 
     /**

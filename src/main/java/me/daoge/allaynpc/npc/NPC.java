@@ -20,6 +20,7 @@ import org.allaymc.api.utils.TextFormat;
 import org.allaymc.api.utils.identifier.Identifier;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.api.world.World;
+import org.allaymc.api.world.chunk.FakeChunkLoader;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 
@@ -44,6 +45,11 @@ public class NPC {
      * EntityPlayer entity
      */
     private EntityPlayer entity;
+
+    /**
+     * FakeChunkLoader to keep the NPC's chunk loaded
+     */
+    private FakeChunkLoader chunkLoader;
 
     /**
      * Last emote play time (tick)
@@ -128,6 +134,10 @@ public class NPC {
                 log.debug("NPC {} spawned at {} in world {}", config.getName(), pos.toVector3d(), pos.getWorld());
             });
 
+            // Create and add FakeChunkLoader to keep NPC's chunk loaded (radius=1)
+            chunkLoader = new FakeChunkLoader(entity::getLocation, 1);
+            dimension.getChunkManager().addChunkLoader(chunkLoader);
+
             return true;
 
         } catch (Exception e) {
@@ -145,9 +155,14 @@ public class NPC {
         }
 
         try {
-            // Engine handles despawning from players automatically
             Dimension dimension = entity.getDimension();
             if (dimension != null) {
+                // Remove FakeChunkLoader first
+                if (chunkLoader != null) {
+                    dimension.getChunkManager().removeChunkLoader(chunkLoader);
+                    chunkLoader = null;
+                }
+                // Engine handles despawning from players automatically
                 dimension.getEntityManager().removeEntity(entity);
             }
         } catch (Exception e) {
@@ -283,6 +298,7 @@ public class NPC {
         try {
             UUID emoteUuid = UUID.fromString(emoteConfig.getId());
             // Send emote to viewers only
+            // TODO: set silence to true when allay-api is bumped to 0.23.0
             entity.forEachViewers(viewer -> viewer.viewPlayerEmote(entity, emoteUuid));
         } catch (IllegalArgumentException e) {
             log.warn("Invalid emote UUID for NPC {}: {}", config.getName(), emoteConfig.getId());

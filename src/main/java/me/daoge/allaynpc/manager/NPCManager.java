@@ -564,40 +564,42 @@ public class NPCManager {
     }
 
     /**
-     * Handle entity despawn event
-     * Remove NPC from spawned list when its entity is despawned
-     *
-     * @param entity despawned entity
-     */
-    public void onEntityDespawn(Entity entity) {
-        for (Map.Entry<String, NPC> entry : spawnedNPCs.entrySet()) {
-            if (entry.getValue().getEntity() == entity) {
-                spawnedNPCs.remove(entry.getKey());
-                log.debug("NPC {} entity despawned, removed from spawned list", entry.getKey());
-                break;
-            }
-        }
-    }
-
-    /**
-     * Spawn NPCs when chunk loads
+     * Handle world load event
+     * Spawn all NPCs in the loaded world
      *
      * @param worldName world name
-     * @param chunkX    chunk X coordinate
-     * @param chunkZ    chunk Z coordinate
      */
-    public void onChunkLoad(String worldName, int chunkX, int chunkZ) {
+    public void onWorldLoad(String worldName) {
         for (NPCConfig config : npcConfigs.values()) {
             if (config.getPosition() == null) continue;
 
-            if (config.getPosition().getWorld().equals(worldName) &&
-                config.getPosition().getChunkX() == chunkX &&
-                config.getPosition().getChunkZ() == chunkZ) {
-
+            if (config.getPosition().getWorld().equals(worldName)) {
                 if (!spawnedNPCs.containsKey(config.getName())) {
                     spawnNPC(config.getName());
                 }
             }
         }
+        log.debug("Spawned NPCs for world: {}", worldName);
+    }
+
+    /**
+     * Handle world unload event
+     * Remove all NPCs in the unloading world
+     *
+     * @param worldName world name
+     */
+    public void onWorldUnload(String worldName) {
+        List<String> toRemove = new ArrayList<>();
+
+        for (Map.Entry<String, NPC> entry : spawnedNPCs.entrySet()) {
+            if (entry.getValue().getWorldName().equals(worldName)) {
+                toRemove.add(entry.getKey());
+            }
+        }
+
+        for (String npcName : toRemove) {
+            removeNPC(npcName);
+        }
+        log.debug("Removed {} NPCs for unloading world: {}", toRemove.size(), worldName);
     }
 }

@@ -12,9 +12,9 @@ import me.daoge.allaynpc.npc.NPC;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.eventbus.EventHandler;
 import org.allaymc.api.eventbus.event.entity.EntityDamageEvent;
-import org.allaymc.api.eventbus.event.entity.EntityDespawnEvent;
 import org.allaymc.api.eventbus.event.player.PlayerInteractEntityEvent;
-import org.allaymc.api.eventbus.event.world.ChunkLoadEvent;
+import org.allaymc.api.eventbus.event.world.WorldLoadEvent;
+import org.allaymc.api.eventbus.event.world.WorldUnloadEvent;
 
 /**
  * NPC event listener
@@ -146,31 +146,28 @@ public class NPCEventListener {
     }
 
     /**
-     * Handle chunk load event
+     * Handle world load event
+     * Spawn all NPCs in the loaded world
      *
      * @param event event object
      */
     @EventHandler
-    private void onChunkLoad(ChunkLoadEvent event) {
-        var dimension = event.getDimension();
-        var chunk = event.getChunk();
-
-        String worldName = dimension.getWorld().getName();
-        int chunkX = chunk.getX();
-        int chunkZ = chunk.getZ();
-
-        // Notify NPC manager that chunk has been loaded
-        AllayNPC.getInstance().getNpcManager().onChunkLoad(worldName, chunkX, chunkZ);
+    private void onWorldLoad(WorldLoadEvent event) {
+        String worldName = event.getWorld().getName();
+        // Notify NPC manager that world has been loaded
+        AllayNPC.getInstance().getNpcManager().onWorldLoad(worldName);
     }
 
     /**
-     * Handle entity despawn event
+     * Handle world unload event
+     * Remove all NPCs in the unloading world
      *
      * @param event event object
      */
     @EventHandler
-    private void onEntityDespawn(EntityDespawnEvent event) {
-        // Notify NPC manager that entity has been despawned
-        AllayNPC.getInstance().getNpcManager().onEntityDespawn(event.getEntity());
+    private void onWorldUnload(WorldUnloadEvent event) {
+        String worldName = event.getWorld().getName();
+        // Notify NPC manager that world is being unloaded
+        AllayNPC.getInstance().getNpcManager().onWorldUnload(worldName);
     }
 }
