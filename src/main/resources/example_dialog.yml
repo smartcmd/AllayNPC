@@ -1,0 +1,32 @@
+# Example Dialog Configuration
+# Place this file in plugins/AllayNPC/dialogs/ folder
+
+# Dialog title (supports color codes and PAPI placeholders)
+title: "Welcome!"
+
+# Dialog body text (supports color codes and PAPI placeholders)
+body: "Hello {player_name}! Welcome to our server.\nHow can I help you today?"
+
+# Dialog buttons (up to 6 buttons)
+buttons:
+  # Button 1 - Shop
+  - text: "Open Shop"
+    commands:
+      - "shop open {player_name}"
+    message: "&aOpening shop..."
+    as_player: false
+
+  # Button 2 - Teleport
+  - text: "Teleport to Spawn"
+    commands:
+      - "tp {player_name} 0 64 0"
+    message: "&aTeleporting to spawn..."
+    as_player: false
+
+  # Button 3 - Info
+  - text: "Server Info"
+    message: "&bWelcome to our server!\n&7Online players: {online}/{max_online}"
+
+  # Button 4 - Close
+  - text: "Close"
+    message: "&7Goodbye!"

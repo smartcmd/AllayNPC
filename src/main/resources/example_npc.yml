@@ -1,0 +1,55 @@
+# Example NPC Configuration
+# Place this file in plugins/AllayNPC/npcs/ folder
+
+# Display name shown above NPC (supports color codes with &)
+display_name: "&6Shop Keeper"
+
+# Whether to always show the name tag
+always_show_name: true
+
+# Skin name (must match a folder name in plugins/AllayNPC/skins/)
+skin: ""
+
+# NPC position
+position:
+  world: "world"
+  x: 100.5
+  y: 65.0
+  z: 200.5
+  yaw: 90.0
+  pitch: 0.0
+
+# Item held by the NPC (Minecraft item ID)
+held_item: "minecraft:diamond_sword"
+
+# Armor worn by the NPC
+armor:
+  helmet: "minecraft:diamond_helmet"
+  chestplate: "minecraft:diamond_chestplate"
+  leggings: "minecraft:diamond_leggings"
+  boots: "minecraft:diamond_boots"
+
+# Whether NPC should look at nearest player
+look_at_player: true
+
+# Emote configuration
+emote:
+  # Emote UUID (leave empty to disable)
+  id: ""
+  # Interval between emotes (in ticks, 20 ticks = 1 second)
+  interval: 100
+
+# Click cooldown (in ticks)
+click_cooldown: 20
+
+# Actions executed when NPC is clicked
+# Supported types: command, dialog, message
+# Supports PAPI placeholders: {player_name}, {x}, {y}, {z}, etc.
+actions:
+  - type: message
+    value: "&aWelcome to the shop, {player_name}!"
+  - type: command
+    value: "say {player_name} is visiting the shop!"
+    as_player: false
+  # - type: dialog
+  #   value: "welcome_dialog"
