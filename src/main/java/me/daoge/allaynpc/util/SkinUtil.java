@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -112,17 +113,18 @@ public class SkinUtil {
 
                     String geometryName;
                     // Handle different format versions (same as RsNPC)
+                    // Set geometryDataEngineVersion for all 4D skins (like RsNPC line 323)
+                    geometryEngineVersion = formatVersion;
+
                     switch (formatVersion) {
                         case "1.16.0":
                         case "1.12.0":
                             geometryName = parseGeometryName(customGeometry);
                             if (geometryName != null && !geometryName.equals("nullvalue")) {
-                                // Generate skin ID for 4D skin (similar to RsNPC's generateSkinId)
-                                skinId = skinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
+                                // Generate skin ID for 4D skin (same as RsNPC's generateSkinId)
+                                skinId = generateSkinId(skinData, resourcePatch, skinName);
                                 geometryData = customGeometry;
-                                // Use actual format version for 4D skins (like RsNPC)
-                                geometryEngineVersion = formatVersion;
                                 log.debug("Loaded 4D skin geometry for {}: {} (version: {})", skinName, geometryName, formatVersion);
                             } else {
                                 log.warn("Failed to parse geometry name from skin.json for {}", skinName);
@@ -135,11 +137,10 @@ public class SkinUtil {
                         case "1.8.0":
                             geometryName = parseGeometryNameLegacy(customGeometry);
                             if (geometryName != null) {
-                                skinId = skinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
+                                // Generate skin ID for 4D skin (same as RsNPC's generateSkinId)
+                                skinId = generateSkinId(skinData, resourcePatch, skinName);
                                 geometryData = customGeometry;
-                                // Use actual format version for 4D skins (like RsNPC)
-                                geometryEngineVersion = formatVersion;
                                 log.debug("Loaded legacy 4D skin geometry for {}: {} (version: {})", skinName, geometryName, formatVersion);
                             }
                             break;
@@ -245,17 +246,19 @@ public class SkinUtil {
                     String customGeometry = Files.readString(skinJson);
                     String formatVersion = parseFormatVersion(customGeometry);
 
+                    // Set geometryDataEngineVersion for all 4D skins (like RsNPC line 323)
+                    geometryEngineVersion = formatVersion;
+
                     String geometryName = null;
                     switch (formatVersion) {
                         case "1.16.0":
                         case "1.12.0":
                             geometryName = parseGeometryName(customGeometry);
                             if (geometryName != null && !geometryName.equals("nullvalue")) {
-                                skinId = baseSkinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
+                                // Generate skin ID for 4D skin (same as RsNPC's generateSkinId)
+                                skinId = generateSkinId(skinData, resourcePatch, baseSkinName);
                                 geometryData = customGeometry;
-                                // Use actual format version for 4D skins (like RsNPC)
-                                geometryEngineVersion = formatVersion;
                             }
                             break;
                         default:
@@ -263,11 +266,10 @@ public class SkinUtil {
                         case "1.8.0":
                             geometryName = parseGeometryNameLegacy(customGeometry);
                             if (geometryName != null) {
-                                skinId = baseSkinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
+                                // Generate skin ID for 4D skin (same as RsNPC's generateSkinId)
+                                skinId = generateSkinId(skinData, resourcePatch, baseSkinName);
                                 geometryData = customGeometry;
-                                // Use actual format version for 4D skins (like RsNPC)
-                                geometryEngineVersion = formatVersion;
                             }
                             break;
                     }
@@ -340,6 +342,9 @@ public class SkinUtil {
             }
         }
 
+        // Free image resources (same as Nukkit-MOT)
+        image.flush();
+
         return data;
     }
 
@@ -402,6 +407,23 @@ public class SkinUtil {
             log.error("Failed to parse legacy geometry name", e);
         }
         return null;
+    }
+
+    /**
+     * Generate skin ID from skin data and resource patch (same as Nukkit's generateSkinId)
+     * Creates a deterministic UUID based on the combined data
+     *
+     * @param skinData      skin pixel data
+     * @param resourcePatch skin resource patch JSON
+     * @param name          skin name suffix
+     * @return generated skin ID
+     */
+    public static String generateSkinId(byte[] skinData, String resourcePatch, String name) {
+        byte[] patchBytes = resourcePatch.getBytes(StandardCharsets.UTF_8);
+        byte[] combined = new byte[skinData.length + patchBytes.length];
+        System.arraycopy(skinData, 0, combined, 0, skinData.length);
+        System.arraycopy(patchBytes, 0, combined, skinData.length, patchBytes.length);
+        return UUID.nameUUIDFromBytes(combined) + "." + name;
     }
 
     /**
