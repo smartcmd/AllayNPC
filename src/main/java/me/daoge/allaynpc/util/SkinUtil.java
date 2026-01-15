@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.allaymc.api.player.Skin;
 
 import javax.imageio.ImageIO;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,9 +41,9 @@ public class SkinUtil {
     public static final String GEOMETRY_CUSTOM_SLIM = "{\"geometry\":{\"default\":\"geometry.humanoid.customSlim\"}}";
 
     /**
-     * Default skin color (light skin tone)
+     * Default skin color (matches player skin default)
      */
-    public static final String DEFAULT_SKIN_COLOR = "#b37b62";
+    public static final String DEFAULT_SKIN_COLOR = "#0";
 
     /**
      * Load skin from folder (following RsNPC's approach)
@@ -140,29 +141,28 @@ public class SkinUtil {
                 }
             }
 
-            // Build Skin object with all required fields
-            String fullSkinId = skinId + "_" + UUID.randomUUID();
+            // Build Skin object with all required fields (matching player skin values)
             Skin skin = new Skin(
                     skinId,                                           // skinId
-                    "",                                               // playFabId
+                    null,                                             // playFabId (null like player)
                     resourcePatch,                                    // skinResourcePatch
                     imageData,                                        // skinData
                     new ArrayList<>(),                                // animations
                     Skin.ImageData.EMPTY,                             // capeData
                     geometryData,                                     // skinGeometry
-                    "",                                               // animationData
-                    geometryEngineVersion,                            // geometryDataEngineVersion
+                    null,                                             // animationData (null like player)
+                    "0.0.0",                                          // geometryDataEngineVersion (0.0.0 like player)
                     false,                                            // premiumSkin
                     false,                                            // personaSkin
                     false,                                            // personaCapeOnClassicSkin
-                    true,                                             // primaryUser
+                    false,                                            // primaryUser (false like player)
                     "",                                               // capeId
-                    fullSkinId,                                       // fullId
+                    null,                                             // fullId (null like player)
                     DEFAULT_SKIN_COLOR,                               // skinColor
                     isSlim ? Skin.ARM_SIZE_SLIM : Skin.ARM_SIZE_WIDE, // armSize
                     new ArrayList<>(),                                // personaPieces
                     new ArrayList<>(),                                // pieceTintColors
-                    true                                              // overrideAppearance
+                    false                                             // overrideAppearance (false like player)
             );
 
             // Validate skin (similar to RsNPC's isValid check)
@@ -176,6 +176,7 @@ public class SkinUtil {
 
             log.info("Successfully loaded skin: {} ({}x{}, slim={})",
                     skinName, image.getWidth(), image.getHeight(), isSlim);
+
             return skin;
 
         } catch (IOException e) {
@@ -221,19 +222,16 @@ public class SkinUtil {
 
             // Use base skin name as ID (similar to RsNPC)
             String skinId = baseSkinName;
-            String fullSkinId = skinId + "_" + UUID.randomUUID();
 
             // Check for 4D skin JSON file alongside the PNG
             Path skinJson = skinFile.getParent().resolve(baseSkinName + ".json");
             String geometryData = STEVE_GEOMETRY;
             String resourcePatch = isSlim ? GEOMETRY_CUSTOM_SLIM : GEOMETRY_CUSTOM;
-            String geometryEngineVersion = "1.12.0";
 
             if (Files.exists(skinJson)) {
                 try {
                     String customGeometry = Files.readString(skinJson);
                     String formatVersion = parseFormatVersion(customGeometry);
-                    geometryEngineVersion = formatVersion;
 
                     String geometryName = null;
                     switch (formatVersion) {
@@ -262,28 +260,28 @@ public class SkinUtil {
                 }
             }
 
-            // Build Skin object
+            // Build Skin object (matching player skin values)
             Skin skin = new Skin(
                     skinId,                                           // skinId
-                    "",                                               // playFabId
+                    null,                                             // playFabId (null like player)
                     resourcePatch,                                    // skinResourcePatch
                     imageData,                                        // skinData
                     new ArrayList<>(),                                // animations
                     Skin.ImageData.EMPTY,                             // capeData
                     geometryData,                                     // skinGeometry
-                    "",                                               // animationData
-                    geometryEngineVersion,                            // geometryDataEngineVersion
+                    null,                                             // animationData (null like player)
+                    "0.0.0",                                          // geometryDataEngineVersion (0.0.0 like player)
                     false,                                            // premiumSkin
                     false,                                            // personaSkin
                     false,                                            // personaCapeOnClassicSkin
-                    true,                                             // primaryUser
+                    false,                                            // primaryUser (false like player)
                     "",                                               // capeId
-                    fullSkinId,                                       // fullId
+                    null,                                             // fullId (null like player)
                     DEFAULT_SKIN_COLOR,                               // skinColor
                     isSlim ? Skin.ARM_SIZE_SLIM : Skin.ARM_SIZE_WIDE, // armSize
                     new ArrayList<>(),                                // personaPieces
                     new ArrayList<>(),                                // pieceTintColors
-                    true                                              // overrideAppearance
+                    false                                             // overrideAppearance (false like player)
             );
 
             // Validate skin
@@ -304,6 +302,7 @@ public class SkinUtil {
 
     /**
      * Convert BufferedImage to RGBA byte array
+     * Using exactly the same approach as Nukkit-MOT's parseBufferedImage()
      *
      * @param image image object
      * @return RGBA byte array
@@ -316,11 +315,12 @@ public class SkinUtil {
         int index = 0;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int pixel = image.getRGB(x, y);
-                data[index++] = (byte) ((pixel >> 16) & 0xFF); // R
-                data[index++] = (byte) ((pixel >> 8) & 0xFF);  // G
-                data[index++] = (byte) (pixel & 0xFF);         // B
-                data[index++] = (byte) ((pixel >> 24) & 0xFF); // A
+                // Use java.awt.Color with hasalpha=true, same as Nukkit-MOT
+                Color color = new Color(image.getRGB(x, y), true);
+                data[index++] = (byte) color.getRed();
+                data[index++] = (byte) color.getGreen();
+                data[index++] = (byte) color.getBlue();
+                data[index++] = (byte) color.getAlpha();
             }
         }
 
@@ -429,25 +429,25 @@ public class SkinUtil {
 
         return new Skin(
                 skinId,                                  // skinId
-                "",                                      // playFabId
+                null,                                    // playFabId (null like player)
                 GEOMETRY_CUSTOM,                         // skinResourcePatch
                 new Skin.ImageData(width, height, skinData), // skinData
                 new ArrayList<>(),                       // animations
                 Skin.ImageData.EMPTY,                    // capeData
                 STEVE_GEOMETRY,                          // skinGeometry
-                "",                                      // animationData
-                "1.12.0",                                // geometryDataEngineVersion
+                null,                                    // animationData (null like player)
+                "0.0.0",                                 // geometryDataEngineVersion (0.0.0 like player)
                 false,                                   // premiumSkin
                 false,                                   // personaSkin
                 false,                                   // personaCapeOnClassicSkin
-                true,                                    // primaryUser
+                false,                                   // primaryUser (false like player)
                 "",                                      // capeId
-                skinId,                                  // fullId
+                null,                                    // fullId (null like player)
                 DEFAULT_SKIN_COLOR,                      // skinColor
                 Skin.ARM_SIZE_WIDE,                      // armSize
                 new ArrayList<>(),                       // personaPieces
                 new ArrayList<>(),                       // pieceTintColors
-                true                                     // overrideAppearance
+                false                                    // overrideAppearance (false like player)
         );
     }
 }

@@ -521,7 +521,8 @@ public class NPCManager {
      * @return whether on cooldown
      */
     public boolean isOnCooldown(EntityPlayer player, String npcName) {
-        String key = player.getRuntimeId() + "_" + npcName;
+        // Use UUID instead of RuntimeId for persistent tracking across reconnects
+        String key = player.getUniqueId() + "_" + npcName;
         Long lastClick = clickCooldowns.get(key);
 
         if (lastClick == null) {
@@ -546,8 +547,36 @@ public class NPCManager {
      * @param npcName NPC name
      */
     public void recordClick(EntityPlayer player, String npcName) {
-        String key = player.getRuntimeId() + "_" + npcName;
+        // Use UUID instead of RuntimeId for persistent tracking across reconnects
+        String key = player.getUniqueId() + "_" + npcName;
         clickCooldowns.put(key, System.currentTimeMillis());
+    }
+
+    /**
+     * Clear expired cooldown records to prevent memory leak
+     * Call this periodically
+     */
+    public void cleanupCooldowns() {
+        long currentTime = System.currentTimeMillis();
+        // Remove entries older than 1 minute (max reasonable cooldown)
+        clickCooldowns.entrySet().removeIf(entry ->
+            currentTime - entry.getValue() > 60000);
+    }
+
+    /**
+     * Handle entity despawn event
+     * Remove NPC from spawned list when its entity is despawned
+     *
+     * @param entity despawned entity
+     */
+    public void onEntityDespawn(Entity entity) {
+        for (Map.Entry<String, NPC> entry : spawnedNPCs.entrySet()) {
+            if (entry.getValue().getEntity() == entity) {
+                spawnedNPCs.remove(entry.getKey());
+                log.debug("NPC {} entity despawned, removed from spawned list", entry.getKey());
+                break;
+            }
+        }
     }
 
     /**

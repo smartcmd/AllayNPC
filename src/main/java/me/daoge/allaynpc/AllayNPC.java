@@ -198,6 +198,11 @@ public class AllayNPC extends Plugin {
                 log.warn("Error updating NPC {}: {}", npc.getName(), e.getMessage());
             }
         }
+
+        // Cleanup expired cooldowns every minute (1200 ticks)
+        if (currentTick % 1200 == 0) {
+            npcManager.cleanupCooldowns();
+        }
     }
 
     /**

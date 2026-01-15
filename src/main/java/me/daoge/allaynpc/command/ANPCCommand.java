@@ -8,6 +8,7 @@ import me.daoge.allaynpc.npc.NPC;
 import org.allaymc.api.command.Command;
 import org.allaymc.api.command.CommandResult;
 import org.allaymc.api.command.SenderType;
+import org.allaymc.api.command.tree.CommandContext;
 import org.allaymc.api.command.tree.CommandTree;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.utils.TextFormat;
@@ -35,7 +36,7 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec((ctx, player) -> {
                         String name = ctx.getResult(1);
-                        return handleCreate(player, name);
+                        return handleCreate(ctx, player, name);
                     }, SenderType.PLAYER)
                 .root()
 
@@ -44,7 +45,7 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec((ctx, player) -> {
                         String name = ctx.getResult(1);
-                        return handleEdit(player, name);
+                        return handleEdit(ctx, player, name);
                     }, SenderType.PLAYER)
                 .root()
 
@@ -53,13 +54,13 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec(ctx -> {
                         String name = ctx.getResult(1);
-                        return handleDelete(ctx.getSender(), name);
+                        return handleDelete(ctx, name);
                     })
                 .root()
 
                 // /anpc list - List all NPCs
                 .key("list")
-                    .exec(ctx -> handleList(ctx.getSender()))
+                    .exec(this::handleList)
                 .root()
 
                 // /anpc tp <name> - Teleport to NPC
@@ -67,18 +68,18 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec((ctx, player) -> {
                         String name = ctx.getResult(1);
-                        return handleTeleport(player, name);
+                        return handleTeleport(ctx, player, name);
                     }, SenderType.PLAYER)
                 .root()
 
                 // /anpc reload - Reload configuration
                 .key("reload")
-                    .exec(ctx -> handleReload(ctx.getSender()))
+                    .exec(this::handleReload)
                 .root()
 
                 // /anpc skins - List all skins
                 .key("skins")
-                    .exec(ctx -> handleSkins(ctx.getSender()))
+                    .exec(this::handleSkins)
                 .root()
 
                 // /anpc spawn <name> - Spawn specified NPC
@@ -86,7 +87,7 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec(ctx -> {
                         String name = ctx.getResult(1);
-                        return handleSpawn(ctx.getSender(), name);
+                        return handleSpawn(ctx, name);
                     })
                 .root()
 
@@ -95,59 +96,60 @@ public class ANPCCommand extends Command {
                     .str("name")
                     .exec(ctx -> {
                         String name = ctx.getResult(1);
-                        return handleRemove(ctx.getSender(), name);
+                        return handleRemove(ctx, name);
                     })
                 .root()
 
                 // /anpc help - Show help
                 .key("help")
-                    .exec(ctx -> handleHelp(ctx.getSender()));
+                    .exec(this::handleHelp);
     }
 
     /**
      * Handle create command
      */
-    private CommandResult handleCreate(EntityPlayer player, String name) {
+    private CommandResult handleCreate(CommandContext ctx, EntityPlayer player, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
 
         // Check if NPC already exists
         if (npcManager.hasNPC(name)) {
             player.sendMessage(TextFormat.RED + "NPC '" + name + "' already exists!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         // Open creation form
         NPCFormHandler.openCreateForm(player, name);
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle edit command
      */
-    private CommandResult handleEdit(EntityPlayer player, String name) {
+    private CommandResult handleEdit(CommandContext ctx, EntityPlayer player, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
 
         // Check if NPC exists
         if (!npcManager.hasNPC(name)) {
             player.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         // Open edit form
         NPCFormHandler.openEditForm(player, name);
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle delete command
      */
-    private CommandResult handleDelete(org.allaymc.api.command.CommandSender sender, String name) {
+    private CommandResult handleDelete(CommandContext ctx, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        var sender = ctx.getSender();
 
         // Check if NPC exists
         if (!npcManager.hasNPC(name)) {
             sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         // Remove NPC entity
@@ -156,23 +158,24 @@ public class ANPCCommand extends Command {
         // Delete config file
         if (npcManager.deleteNPCConfig(name)) {
             sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been deleted!");
-            return CommandResult.success(null);
+            return ctx.success();
         } else {
             sender.sendMessage(TextFormat.RED + "Failed to delete NPC config file!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
     }
 
     /**
      * Handle list command
      */
-    private CommandResult handleList(org.allaymc.api.command.CommandSender sender) {
+    private CommandResult handleList(CommandContext ctx) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        var sender = ctx.getSender();
         Set<String> npcNames = npcManager.getNPCNames();
 
         if (npcNames.isEmpty()) {
             sender.sendMessage(TextFormat.YELLOW + "No NPCs found.");
-            return CommandResult.success(null);
+            return ctx.success();
         }
 
         StringBuilder sb = new StringBuilder();
@@ -192,51 +195,66 @@ public class ANPCCommand extends Command {
         }
 
         sender.sendMessage(sb.toString());
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle teleport command
      */
-    private CommandResult handleTeleport(EntityPlayer player, String name) {
+    private CommandResult handleTeleport(CommandContext ctx, EntityPlayer player, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
         NPCConfig config = npcManager.getNPCConfig(name);
 
         if (config == null || config.getPosition() == null) {
             player.sendMessage(TextFormat.RED + "NPC '" + name + "' not found or has no position!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         var pos = config.getPosition();
+
+        // Get NPC's world and dimension
+        var world = org.allaymc.api.server.Server.getInstance().getWorldPool().getWorld(pos.getWorld());
+        if (world == null) {
+            player.sendMessage(TextFormat.RED + "World '" + pos.getWorld() + "' not found!");
+            return ctx.fail();
+        }
+
+        var dimension = world.getOverWorld();
+        if (dimension == null) {
+            player.sendMessage(TextFormat.RED + "Dimension not found!");
+            return ctx.fail();
+        }
+
         var targetLoc = new org.allaymc.api.math.location.Location3d(
                 pos.getX(), pos.getY(), pos.getZ(),
                 pos.getPitch(), pos.getYaw(),
-                player.getLocation().dimension()
+                dimension
         );
         player.teleport(targetLoc);
         player.sendMessage(TextFormat.GREEN + "Teleported to NPC '" + name + "'!");
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle reload command
      */
-    private CommandResult handleReload(org.allaymc.api.command.CommandSender sender) {
+    private CommandResult handleReload(CommandContext ctx) {
         AllayNPC.getInstance().reload();
-        sender.sendMessage(TextFormat.GREEN + "AllayNPC reloaded!");
-        return CommandResult.success(null);
+        ctx.getSender().sendMessage(TextFormat.GREEN + "AllayNPC reloaded!");
+        return ctx.success();
     }
 
     /**
      * Handle skins list command
      */
-    private CommandResult handleSkins(org.allaymc.api.command.CommandSender sender) {
+    private CommandResult handleSkins(CommandContext ctx) {
         var skinManager = AllayNPC.getInstance().getSkinManager();
+        var sender = ctx.getSender();
         Set<String> skinNames = skinManager.getSkinNames();
 
         if (skinNames.isEmpty()) {
             sender.sendMessage(TextFormat.YELLOW + "No skins found.");
-            return CommandResult.success(null);
+            return ctx.success();
         }
 
         StringBuilder sb = new StringBuilder();
@@ -247,49 +265,51 @@ public class ANPCCommand extends Command {
         }
 
         sender.sendMessage(sb.toString());
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle spawn command
      */
-    private CommandResult handleSpawn(org.allaymc.api.command.CommandSender sender, String name) {
+    private CommandResult handleSpawn(CommandContext ctx, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        var sender = ctx.getSender();
 
         if (!npcManager.hasNPC(name)) {
             sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         if (npcManager.spawnNPC(name)) {
             sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been spawned!");
-            return CommandResult.success(null);
+            return ctx.success();
         } else {
             sender.sendMessage(TextFormat.RED + "Failed to spawn NPC '" + name + "'!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
     }
 
     /**
      * Handle remove command
      */
-    private CommandResult handleRemove(org.allaymc.api.command.CommandSender sender, String name) {
+    private CommandResult handleRemove(CommandContext ctx, String name) {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        var sender = ctx.getSender();
 
         if (!npcManager.hasNPC(name)) {
             sender.sendMessage(TextFormat.RED + "NPC '" + name + "' not found!");
-            return CommandResult.fail();
+            return ctx.fail();
         }
 
         npcManager.removeNPC(name);
         sender.sendMessage(TextFormat.GREEN + "NPC '" + name + "' has been removed!");
-        return CommandResult.success(null);
+        return ctx.success();
     }
 
     /**
      * Handle help command
      */
-    private CommandResult handleHelp(org.allaymc.api.command.CommandSender sender) {
+    private CommandResult handleHelp(CommandContext ctx) {
         StringBuilder sb = new StringBuilder();
         sb.append(TextFormat.GREEN).append("=== AllayNPC Commands ===\n");
         sb.append(TextFormat.YELLOW).append("/anpc create <name>").append(TextFormat.WHITE).append(" - Create a new NPC\n");
@@ -302,7 +322,7 @@ public class ANPCCommand extends Command {
         sb.append(TextFormat.YELLOW).append("/anpc skins").append(TextFormat.WHITE).append(" - List available skins\n");
         sb.append(TextFormat.YELLOW).append("/anpc reload").append(TextFormat.WHITE).append(" - Reload configuration\n");
 
-        sender.sendMessage(sb.toString());
-        return CommandResult.success(null);
+        ctx.getSender().sendMessage(sb.toString());
+        return ctx.success();
     }
 }

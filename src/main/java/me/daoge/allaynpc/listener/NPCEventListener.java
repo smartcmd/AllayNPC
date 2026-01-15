@@ -12,6 +12,7 @@ import me.daoge.allaynpc.npc.NPC;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.eventbus.EventHandler;
 import org.allaymc.api.eventbus.event.entity.EntityDamageEvent;
+import org.allaymc.api.eventbus.event.entity.EntityDespawnEvent;
 import org.allaymc.api.eventbus.event.player.PlayerInteractEntityEvent;
 import org.allaymc.api.eventbus.event.world.ChunkLoadEvent;
 
@@ -160,5 +161,16 @@ public class NPCEventListener {
 
         // Notify NPC manager that chunk has been loaded
         AllayNPC.getInstance().getNpcManager().onChunkLoad(worldName, chunkX, chunkZ);
+    }
+
+    /**
+     * Handle entity despawn event
+     *
+     * @param event event object
+     */
+    @EventHandler
+    private void onEntityDespawn(EntityDespawnEvent event) {
+        // Notify NPC manager that entity has been despawned
+        AllayNPC.getInstance().getNpcManager().onEntityDespawn(event.getEntity());
     }
 }

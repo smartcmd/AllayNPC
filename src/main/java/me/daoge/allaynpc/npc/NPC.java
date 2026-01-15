@@ -11,7 +11,7 @@ import org.allaymc.api.entity.type.EntityTypes;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.math.location.Location3d;
 import org.allaymc.api.math.location.Location3dc;
-import org.allaymc.api.player.Player;
+import org.allaymc.api.player.GameMode;
 import org.allaymc.api.player.Skin;
 import org.allaymc.api.registry.Registries;
 import org.allaymc.api.server.Server;
@@ -45,11 +45,6 @@ public class NPC {
     private EntityPlayer entity;
 
     /**
-     * Whether spawned
-     */
-    private boolean spawned = false;
-
-    /**
      * Last emote play time (tick)
      */
     private long lastEmoteTick = 0;
@@ -69,7 +64,7 @@ public class NPC {
      * @return whether spawn was successful
      */
     public boolean spawn() {
-        if (spawned) {
+        if (isSpawned()) {
             log.warn("NPC {} is already spawned", config.getName());
             return false;
         }
@@ -112,6 +107,12 @@ public class NPC {
             entity.setNameTag(displayName);
             entity.setNameTagAlwaysShow(config.isAlwaysShowName());
 
+            // Set NPC as immobile (can look around but cannot move)
+            entity.setImmobile(true);
+
+            // Set gamemode to survival so EntityDamageEvent can be triggered
+            entity.setGameMode(GameMode.SURVIVAL);
+
             // Apply skin BEFORE spawning
             applySkin();
 
@@ -123,7 +124,6 @@ public class NPC {
 
             // Add entity to world (engine handles spawning to players automatically)
             dimension.getEntityManager().addEntity(entity, () -> {
-                spawned = true;
                 log.debug("NPC {} spawned at {} in world {}", config.getName(), pos.toVector3d(), pos.getWorld());
             });
 
@@ -139,7 +139,7 @@ public class NPC {
      * Remove NPC
      */
     public void remove() {
-        if (!spawned || entity == null) {
+        if (entity == null) {
             return;
         }
 
@@ -153,7 +153,6 @@ public class NPC {
             log.error("Failed to remove NPC {}", config.getName(), e);
         }
 
-        spawned = false;
         entity = null;
     }
 
@@ -273,7 +272,7 @@ public class NPC {
      * Play emote action
      */
     public void playEmote() {
-        if (!spawned || entity == null) return;
+        if (!isSpawned()) return;
 
         NPCConfig.EmoteConfig emoteConfig = config.getEmote();
         if (emoteConfig == null || !emoteConfig.isEnabled()) {
@@ -282,10 +281,8 @@ public class NPC {
 
         try {
             UUID emoteUuid = UUID.fromString(emoteConfig.getId());
-            // Send emote to all online players
-            Server.getInstance().getPlayerManager().forEachPlayer(player -> {
-                player.viewPlayerEmote(entity, emoteUuid);
-            });
+            // Send emote to viewers only
+            entity.forEachViewers(viewer -> viewer.viewPlayerEmote(entity, emoteUuid));
         } catch (IllegalArgumentException e) {
             log.warn("Invalid emote UUID for NPC {}: {}", config.getName(), emoteConfig.getId());
         }
@@ -315,7 +312,7 @@ public class NPC {
      * Look at the nearest player within range
      */
     public void lookAtNearestPlayer() {
-        if (!spawned || entity == null || !config.isLookAtPlayer()) return;
+        if (!isSpawned() || !config.isLookAtPlayer()) return;
 
         EntityPlayer nearestPlayer = findNearestPlayer();
         if (nearestPlayer != null) {
@@ -336,15 +333,11 @@ public class NPC {
         EntityPlayer nearest = null;
         double nearestDistSq = Double.MAX_VALUE;
 
-        // Search within 32 blocks
+        // Search within 32 blocks among viewers
         double maxDistSq = 32.0 * 32.0;
 
-        for (Player player : Server.getInstance().getPlayerManager().getPlayers().values()) {
-            EntityPlayer playerEntity = player.getControlledEntity();
-            if (playerEntity == null) continue;
-
-            // Check if same dimension
-            if (playerEntity.getDimension() != entity.getDimension()) continue;
+        for (var viewer : entity.getViewers()) {
+            if (!(viewer instanceof EntityPlayer playerEntity)) continue;
 
             Location3dc playerLoc = playerEntity.getLocation();
             double dx = playerLoc.x() - npcLoc.x();
@@ -367,7 +360,7 @@ public class NPC {
      * @param player target player
      */
     public void lookAt(EntityPlayer player) {
-        if (!spawned || entity == null || !config.isLookAtPlayer()) return;
+        if (!isSpawned() || !config.isLookAtPlayer()) return;
 
         try {
             Location3dc npcLoc = entity.getLocation();
@@ -404,6 +397,15 @@ public class NPC {
         } catch (Exception e) {
             log.warn("Failed to look at player for NPC {}", config.getName(), e);
         }
+    }
+
+    /**
+     * Check if NPC is spawned
+     *
+     * @return true if spawned
+     */
+    public boolean isSpawned() {
+        return entity != null && entity.isSpawned();
     }
 
     /**

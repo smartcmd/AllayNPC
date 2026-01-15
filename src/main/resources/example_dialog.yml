@@ -12,14 +12,14 @@ buttons:
   # Button 1 - Shop
   - text: "Open Shop"
     commands:
-      - "shop open {player_name}"
+      - "shop open \"{player_name}\""
     message: "&aOpening shop..."
     as_player: false
 
   # Button 2 - Teleport
   - text: "Teleport to Spawn"
     commands:
-      - "tp {player_name} 0 64 0"
+      - "tp \"{player_name}\" 0 64 0"
     message: "&aTeleporting to spawn..."
     as_player: false
 

@@ -49,7 +49,7 @@ actions:
   - type: message
     value: "&aWelcome to the shop, {player_name}!"
   - type: command
-    value: "say {player_name} is visiting the shop!"
+    value: "say \"{player_name}\" is visiting the shop!"
     as_player: false
   # - type: dialog
   #   value: "welcome_dialog"
