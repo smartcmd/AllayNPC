@@ -56,17 +56,14 @@ public class NPCFormHandler {
                 .input("Click Cooldown (ticks)", "20", "20")
                 .label("Position will be set to your current location")
                 .onResponse(responses -> {
-                    // Parse form response
+                    // Parse form response safely
                     String displayName = responses.get(0);
-                    boolean alwaysShowName = responses.get(1).equals("true");
-                    int skinIndex = Integer.parseInt(responses.get(2));
-                    String skinName = skinIndex > 0 ? skinList.get(skinIndex) : "";
-                    boolean lookAtPlayer = responses.get(3).equals("true");
+                    boolean alwaysShowName = parseBoolean(responses.get(1), true);
+                    int skinIndex = parseInt(responses.get(2), 0);
+                    String skinName = (skinIndex > 0 && skinIndex < skinList.size()) ? skinList.get(skinIndex) : "";
+                    boolean lookAtPlayer = parseBoolean(responses.get(3), true);
                     String heldItem = responses.get(4);
-                    int clickCooldown = 20;
-                    try {
-                        clickCooldown = Integer.parseInt(responses.get(5));
-                    } catch (NumberFormatException ignored) {}
+                    int clickCooldown = parseInt(responses.get(5), 20);
 
                     // Create NPC config
                     NPCConfig config = NPCConfig.builder()
@@ -173,15 +170,12 @@ public class NPCFormHandler {
                 .input("Click Cooldown (ticks)", "20", String.valueOf(config.getClickCooldown()))
                 .onResponse(responses -> {
                     String displayName = responses.get(0);
-                    boolean alwaysShowName = responses.get(1).equals("true");
-                    int skinIndex = Integer.parseInt(responses.get(2));
-                    String skinName = skinIndex > 0 ? skinList.get(skinIndex) : "";
-                    boolean lookAtPlayer = responses.get(3).equals("true");
+                    boolean alwaysShowName = parseBoolean(responses.get(1), config.isAlwaysShowName());
+                    int skinIndex = parseInt(responses.get(2), 0);
+                    String skinName = (skinIndex > 0 && skinIndex < skinList.size()) ? skinList.get(skinIndex) : "";
+                    boolean lookAtPlayer = parseBoolean(responses.get(3), config.isLookAtPlayer());
                     String heldItem = responses.get(4);
-                    int clickCooldown = config.getClickCooldown();
-                    try {
-                        clickCooldown = Integer.parseInt(responses.get(5));
-                    } catch (NumberFormatException ignored) {}
+                    int clickCooldown = parseInt(responses.get(5), config.getClickCooldown());
 
                     // Update config
                     config.setDisplayName(displayName.isEmpty() ? npcName : displayName);
@@ -313,9 +307,7 @@ public class NPCFormHandler {
                 .label("Leave UUID empty to disable emotes")
                 .onResponse(responses -> {
                     finalEmote.setId(responses.get(0));
-                    try {
-                        finalEmote.setInterval(Integer.parseInt(responses.get(1)));
-                    } catch (NumberFormatException ignored) {}
+                    finalEmote.setInterval(parseInt(responses.get(1), finalEmote.getInterval()));
 
                     npcManager.saveNPCConfig(config);
                     player.sendMessage(TextFormat.GREEN + "Emote settings updated!");
@@ -380,9 +372,10 @@ public class NPCFormHandler {
                 .input("Value", "Command/Message/Dialog name", "")
                 .toggle("Execute as Player (for commands)", false)
                 .onResponse(responses -> {
-                    int typeIndex = Integer.parseInt(responses.get(0));
+                    int typeIndex = parseInt(responses.get(0), 0);
+                    if (typeIndex < 0 || typeIndex >= actionTypes.size()) typeIndex = 0;
                     String value = responses.get(1);
-                    boolean asPlayer = responses.get(2).equals("true");
+                    boolean asPlayer = parseBoolean(responses.get(2), false);
 
                     NPCConfig.ActionConfig.ActionType type = NPCConfig.ActionConfig.ActionType.valueOf(actionTypes.get(typeIndex));
                     NPCConfig.ActionConfig action = NPCConfig.ActionConfig.builder()
@@ -463,9 +456,10 @@ public class NPCFormHandler {
                 .input("Value", "Command/Message/Dialog name", action.getValue())
                 .toggle("Execute as Player (for commands)", action.isAsPlayer())
                 .onResponse(responses -> {
-                    int typeIndex = Integer.parseInt(responses.get(0));
+                    int typeIndex = parseInt(responses.get(0), 0);
+                    if (typeIndex < 0 || typeIndex >= actionTypes.size()) typeIndex = 0;
                     String value = responses.get(1);
-                    boolean asPlayer = responses.get(2).equals("true");
+                    boolean asPlayer = parseBoolean(responses.get(2), action.isAsPlayer());
 
                     action.setType(NPCConfig.ActionConfig.ActionType.valueOf(actionTypes.get(typeIndex)));
                     action.setValue(value);
@@ -486,5 +480,28 @@ public class NPCFormHandler {
         if (str == null) return "";
         if (str.length() <= maxLength) return str;
         return str.substring(0, maxLength - 3) + "...";
+    }
+
+    /**
+     * Safely parse boolean from form response
+     * Handles both Boolean objects and "true"/"false" strings
+     */
+    private static boolean parseBoolean(Object value, boolean defaultValue) {
+        if (value == null) return defaultValue;
+        if (value instanceof Boolean b) return b;
+        return "true".equalsIgnoreCase(value.toString());
+    }
+
+    /**
+     * Safely parse integer from form response
+     */
+    private static int parseInt(Object value, int defaultValue) {
+        if (value == null) return defaultValue;
+        try {
+            if (value instanceof Number n) return n.intValue();
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 }

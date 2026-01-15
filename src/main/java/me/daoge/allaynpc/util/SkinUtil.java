@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.allaymc.api.player.Skin;
+import org.intellij.lang.annotations.Language;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -28,7 +29,10 @@ public class SkinUtil {
     /**
      * Default geometry data for Steve skin
      */
-    public static final String STEVE_GEOMETRY = "{\"format_version\":\"1.12.0\",\"minecraft:geometry\":[{\"bones\":[{\"name\":\"body\",\"parent\":\"waist\",\"pivot\":[0.0,24.0,0.0]},{\"name\":\"waist\",\"pivot\":[0.0,12.0,0.0]},{\"cubes\":[{\"origin\":[-5.0,8.0,3.0],\"size\":[10,16,1],\"uv\":[0,0]}],\"name\":\"cape\",\"parent\":\"body\",\"pivot\":[0.0,24.0,3.0],\"rotation\":[0.0,180.0,0.0]}],\"description\":{\"identifier\":\"geometry.cape\",\"texture_height\":32,\"texture_width\":64}},{\"bones\":[{\"name\":\"root\",\"pivot\":[0.0,0.0,0.0]},{\"cubes\":[{\"origin\":[-4.0,12.0,-2.0],\"size\":[8,12,4],\"uv\":[16,16]}],\"name\":\"body\",\"parent\":\"waist\",\"pivot\":[0.0,24.0,0.0]},{\"name\":\"waist\",\"parent\":\"root\",\"pivot\":[0.0,12.0,0.0]},{\"cubes\":[{\"origin\":[-4.0,24.0,-4.0],\"size\":[8,8,8],\"uv\":[0,0]}],\"name\":\"head\",\"parent\":\"body\",\"pivot\":[0.0,24.0,0.0]},{\"name\":\"cape\",\"parent\":\"body\",\"pivot\":[0.0,24,3.0]},{\"cubes\":[{\"inflate\":0.50,\"origin\":[-4.0,24.0,-4.0],\"size\":[8,8,8],\"uv\":[32,0]}],\"name\":\"hat\",\"parent\":\"head\",\"pivot\":[0.0,24.0,0.0]},{\"cubes\":[{\"origin\":[4.0,12.0,-2.0],\"size\":[4,12,4],\"uv\":[32,48]}],\"name\":\"leftArm\",\"parent\":\"body\",\"pivot\":[5.0,22.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[4.0,12.0,-2.0],\"size\":[4,12,4],\"uv\":[48,48]}],\"name\":\"leftSleeve\",\"parent\":\"leftArm\",\"pivot\":[5.0,22.0,0.0]},{\"name\":\"leftItem\",\"parent\":\"leftArm\",\"pivot\":[6.0,15.0,1.0]},{\"cubes\":[{\"origin\":[-8.0,12.0,-2.0],\"size\":[4,12,4],\"uv\":[40,16]}],\"name\":\"rightArm\",\"parent\":\"body\",\"pivot\":[-5.0,22.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-8.0,12.0,-2.0],\"size\":[4,12,4],\"uv\":[40,32]}],\"name\":\"rightSleeve\",\"parent\":\"rightArm\",\"pivot\":[-5.0,22.0,0.0]},{\"locators\":{\"lead_hold\":[-6,15,1]},\"name\":\"rightItem\",\"parent\":\"rightArm\",\"pivot\":[-6,15,1]},{\"cubes\":[{\"origin\":[-0.10,0.0,-2.0],\"size\":[4,12,4],\"uv\":[16,48]}],\"name\":\"leftLeg\",\"parent\":\"root\",\"pivot\":[1.90,12.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-0.10,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,48]}],\"name\":\"leftPants\",\"parent\":\"leftLeg\",\"pivot\":[1.90,12.0,0.0]},{\"cubes\":[{\"origin\":[-3.90,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,16]}],\"name\":\"rightLeg\",\"parent\":\"root\",\"pivot\":[-1.90,12.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-3.90,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,32]}],\"name\":\"rightPants\",\"parent\":\"rightLeg\",\"pivot\":[-1.90,12.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-4.0,12.0,-2.0],\"size\":[8,12,4],\"uv\":[16,32]}],\"name\":\"jacket\",\"parent\":\"body\",\"pivot\":[0.0,24.0,0.0]}],\"description\":{\"identifier\":\"geometry.humanoid.custom\",\"texture_height\":64,\"texture_width\":64,\"visible_bounds_height\":2,\"visible_bounds_offset\":[0,1,0],\"visible_bounds_width\":1}},{\"bones\":[{\"name\":\"root\",\"pivot\":[0.0,0.0,0.0]},{\"name\":\"waist\",\"parent\":\"root\",\"pivot\":[0.0,12.0,0.0]},{\"cubes\":[{\"origin\":[-4.0,12.0,-2.0],\"size\":[8,12,4],\"uv\":[16,16]}],\"name\":\"body\",\"parent\":\"waist\",\"pivot\":[0.0,24.0,0.0]},{\"cubes\":[{\"origin\":[-4.0,24.0,-4.0],\"size\":[8,8,8],\"uv\":[0,0]}],\"name\":\"head\",\"parent\":\"body\",\"pivot\":[0.0,24.0,0.0]},{\"cubes\":[{\"inflate\":0.50,\"origin\":[-4.0,24.0,-4.0],\"size\":[8,8,8],\"uv\":[32,0]}],\"name\":\"hat\",\"parent\":\"head\",\"pivot\":[0.0,24.0,0.0]},{\"cubes\":[{\"origin\":[-3.90,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,16]}],\"name\":\"rightLeg\",\"parent\":\"root\",\"pivot\":[-1.90,12.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-3.90,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,32]}],\"name\":\"rightPants\",\"parent\":\"rightLeg\",\"pivot\":[-1.90,12.0,0.0]},{\"cubes\":[{\"origin\":[-0.10,0.0,-2.0],\"size\":[4,12,4],\"uv\":[16,48]}],\"name\":\"leftLeg\",\"parent\":\"root\",\"pivot\":[1.90,12.0,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-0.10,0.0,-2.0],\"size\":[4,12,4],\"uv\":[0,48]}],\"name\":\"leftPants\",\"parent\":\"leftLeg\",\"pivot\":[1.90,12.0,0.0]},{\"cubes\":[{\"origin\":[4.0,11.50,-2.0],\"size\":[3,12,4],\"uv\":[32,48]}],\"name\":\"leftArm\",\"parent\":\"body\",\"pivot\":[5.0,21.50,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[4.0,11.50,-2.0],\"size\":[3,12,4],\"uv\":[48,48]}],\"name\":\"leftSleeve\",\"parent\":\"leftArm\",\"pivot\":[5.0,21.50,0.0]},{\"name\":\"leftItem\",\"parent\":\"leftArm\",\"pivot\":[6,14.50,1]},{\"cubes\":[{\"origin\":[-7.0,11.50,-2.0],\"size\":[3,12,4],\"uv\":[40,16]}],\"name\":\"rightArm\",\"parent\":\"body\",\"pivot\":[-5.0,21.50,0.0]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-7.0,11.50,-2.0],\"size\":[3,12,4],\"uv\":[40,32]}],\"name\":\"rightSleeve\",\"parent\":\"rightArm\",\"pivot\":[-5.0,21.50,0.0]},{\"locators\":{\"lead_hold\":[-6,14.50,1]},\"name\":\"rightItem\",\"parent\":\"rightArm\",\"pivot\":[-6,14.50,1]},{\"cubes\":[{\"inflate\":0.250,\"origin\":[-4.0,12.0,-2.0],\"size\":[8,12,4],\"uv\":[16,32]}],\"name\":\"jacket\",\"parent\":\"body\",\"pivot\":[0.0,24.0,0.0]},{\"name\":\"cape\",\"parent\":\"body\",\"pivot\":[0.0,24,-3.0]}],\"description\":{\"identifier\":\"geometry.humanoid.customSlim\",\"texture_height\":64,\"texture_width\":64,\"visible_bounds_height\":2,\"visible_bounds_offset\":[0,1,0],\"visible_bounds_width\":1}}]}";
+    @Language("json")
+    public static final String STEVE_GEOMETRY = """
+            {"format_version":"1.12.0","minecraft:geometry":[{"bones":[{"name":"body","parent":"waist","pivot":[0.0,24.0,0.0]},{"name":"waist","pivot":[0.0,12.0,0.0]},{"cubes":[{"origin":[-5.0,8.0,3.0],"size":[10,16,1],"uv":[0,0]}],"name":"cape","parent":"body","pivot":[0.0,24.0,3.0],"rotation":[0.0,180.0,0.0]}],"description":{"identifier":"geometry.cape","texture_height":32,"texture_width":64}},{"bones":[{"name":"root","pivot":[0.0,0.0,0.0]},{"cubes":[{"origin":[-4.0,12.0,-2.0],"size":[8,12,4],"uv":[16,16]}],"name":"body","parent":"waist","pivot":[0.0,24.0,0.0]},{"name":"waist","parent":"root","pivot":[0.0,12.0,0.0]},{"cubes":[{"origin":[-4.0,24.0,-4.0],"size":[8,8,8],"uv":[0,0]}],"name":"head","parent":"body","pivot":[0.0,24.0,0.0]},{"name":"cape","parent":"body","pivot":[0.0,24,3.0]},{"cubes":[{"inflate":0.50,"origin":[-4.0,24.0,-4.0],"size":[8,8,8],"uv":[32,0]}],"name":"hat","parent":"head","pivot":[0.0,24.0,0.0]},{"cubes":[{"origin":[4.0,12.0,-2.0],"size":[4,12,4],"uv":[32,48]}],"name":"leftArm","parent":"body","pivot":[5.0,22.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[4.0,12.0,-2.0],"size":[4,12,4],"uv":[48,48]}],"name":"leftSleeve","parent":"leftArm","pivot":[5.0,22.0,0.0]},{"name":"leftItem","parent":"leftArm","pivot":[6.0,15.0,1.0]},{"cubes":[{"origin":[-8.0,12.0,-2.0],"size":[4,12,4],"uv":[40,16]}],"name":"rightArm","parent":"body","pivot":[-5.0,22.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-8.0,12.0,-2.0],"size":[4,12,4],"uv":[40,32]}],"name":"rightSleeve","parent":"rightArm","pivot":[-5.0,22.0,0.0]},{"locators":{"lead_hold":[-6,15,1]},"name":"rightItem","parent":"rightArm","pivot":[-6,15,1]},{"cubes":[{"origin":[-0.10,0.0,-2.0],"size":[4,12,4],"uv":[16,48]}],"name":"leftLeg","parent":"root","pivot":[1.90,12.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-0.10,0.0,-2.0],"size":[4,12,4],"uv":[0,48]}],"name":"leftPants","parent":"leftLeg","pivot":[1.90,12.0,0.0]},{"cubes":[{"origin":[-3.90,0.0,-2.0],"size":[4,12,4],"uv":[0,16]}],"name":"rightLeg","parent":"root","pivot":[-1.90,12.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-3.90,0.0,-2.0],"size":[4,12,4],"uv":[0,32]}],"name":"rightPants","parent":"rightLeg","pivot":[-1.90,12.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-4.0,12.0,-2.0],"size":[8,12,4],"uv":[16,32]}],"name":"jacket","parent":"body","pivot":[0.0,24.0,0.0]}],"description":{"identifier":"geometry.humanoid.custom","texture_height":64,"texture_width":64,"visible_bounds_height":2,"visible_bounds_offset":[0,1,0],"visible_bounds_width":1}},{"bones":[{"name":"root","pivot":[0.0,0.0,0.0]},{"name":"waist","parent":"root","pivot":[0.0,12.0,0.0]},{"cubes":[{"origin":[-4.0,12.0,-2.0],"size":[8,12,4],"uv":[16,16]}],"name":"body","parent":"waist","pivot":[0.0,24.0,0.0]},{"cubes":[{"origin":[-4.0,24.0,-4.0],"size":[8,8,8],"uv":[0,0]}],"name":"head","parent":"body","pivot":[0.0,24.0,0.0]},{"cubes":[{"inflate":0.50,"origin":[-4.0,24.0,-4.0],"size":[8,8,8],"uv":[32,0]}],"name":"hat","parent":"head","pivot":[0.0,24.0,0.0]},{"cubes":[{"origin":[-3.90,0.0,-2.0],"size":[4,12,4],"uv":[0,16]}],"name":"rightLeg","parent":"root","pivot":[-1.90,12.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-3.90,0.0,-2.0],"size":[4,12,4],"uv":[0,32]}],"name":"rightPants","parent":"rightLeg","pivot":[-1.90,12.0,0.0]},{"cubes":[{"origin":[-0.10,0.0,-2.0],"size":[4,12,4],"uv":[16,48]}],"name":"leftLeg","parent":"root","pivot":[1.90,12.0,0.0]},{"cubes":[{"inflate":0.250,"origin":[-0.10,0.0,-2.0],"size":[4,12,4],"uv":[0,48]}],"name":"leftPants","parent":"leftLeg","pivot":[1.90,12.0,0.0]},{"cubes":[{"origin":[4.0,11.50,-2.0],"size":[3,12,4],"uv":[32,48]}],"name":"leftArm","parent":"body","pivot":[5.0,21.50,0.0]},{"cubes":[{"inflate":0.250,"origin":[4.0,11.50,-2.0],"size":[3,12,4],"uv":[48,48]}],"name":"leftSleeve","parent":"leftArm","pivot":[5.0,21.50,0.0]},{"name":"leftItem","parent":"leftArm","pivot":[6,14.50,1]},{"cubes":[{"origin":[-7.0,11.50,-2.0],"size":[3,12,4],"uv":[40,16]}],"name":"rightArm","parent":"body","pivot":[-5.0,21.50,0.0]},{"cubes":[{"inflate":0.250,"origin":[-7.0,11.50,-2.0],"size":[3,12,4],"uv":[40,32]}],"name":"rightSleeve","parent":"rightArm","pivot":[-5.0,21.50,0.0]},{"locators":{"lead_hold":[-6,14.50,1]},"name":"rightItem","parent":"rightArm","pivot":[-6,14.50,1]},{"cubes":[{"inflate":0.250,"origin":[-4.0,12.0,-2.0],"size":[8,12,4],"uv":[16,32]}],"name":"jacket","parent":"body","pivot":[0.0,24.0,0.0]},{"name":"cape","parent":"body","pivot":[0.0,24,-3.0]}],"description":{"identifier":"geometry.humanoid.customSlim","texture_height":64,"texture_width":64,"visible_bounds_height":2,"visible_bounds_offset":[0,1,0],"visible_bounds_width":1}}]}
+            """;
 
     /**
      * Wide arm resource patch
@@ -96,16 +100,17 @@ public class SkinUtil {
             String skinId = skinName;
             String resourcePatch = isSlim ? GEOMETRY_CUSTOM_SLIM : GEOMETRY_CUSTOM;
             String geometryData = STEVE_GEOMETRY;
-            String geometryEngineVersion = "1.12.0";
+            // For regular skins: use "0.0.0" (like player)
+            // For 4D skins: use actual format version (like RsNPC)
+            String geometryEngineVersion = "0.0.0";
 
             // Check if custom geometry data exists (4D skin) - following RsNPC's approach
             if (Files.exists(skinJson)) {
                 try {
                     String customGeometry = Files.readString(skinJson);
                     String formatVersion = parseFormatVersion(customGeometry);
-                    geometryEngineVersion = formatVersion;
 
-                    String geometryName = null;
+                    String geometryName;
                     // Handle different format versions (same as RsNPC)
                     switch (formatVersion) {
                         case "1.16.0":
@@ -116,7 +121,9 @@ public class SkinUtil {
                                 skinId = skinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
                                 geometryData = customGeometry;
-                                log.debug("Loaded 4D skin geometry for {}: {}", skinName, geometryName);
+                                // Use actual format version for 4D skins (like RsNPC)
+                                geometryEngineVersion = formatVersion;
+                                log.debug("Loaded 4D skin geometry for {}: {} (version: {})", skinName, geometryName, formatVersion);
                             } else {
                                 log.warn("Failed to parse geometry name from skin.json for {}", skinName);
                             }
@@ -131,7 +138,9 @@ public class SkinUtil {
                                 skinId = skinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
                                 geometryData = customGeometry;
-                                log.debug("Loaded legacy 4D skin geometry for {}: {}", skinName, geometryName);
+                                // Use actual format version for 4D skins (like RsNPC)
+                                geometryEngineVersion = formatVersion;
+                                log.debug("Loaded legacy 4D skin geometry for {}: {} (version: {})", skinName, geometryName, formatVersion);
                             }
                             break;
                     }
@@ -141,7 +150,7 @@ public class SkinUtil {
                 }
             }
 
-            // Build Skin object with all required fields (matching player skin values)
+            // Build Skin object with all required fields
             Skin skin = new Skin(
                     skinId,                                           // skinId
                     null,                                             // playFabId (null like player)
@@ -151,7 +160,7 @@ public class SkinUtil {
                     Skin.ImageData.EMPTY,                             // capeData
                     geometryData,                                     // skinGeometry
                     null,                                             // animationData (null like player)
-                    "0.0.0",                                          // geometryDataEngineVersion (0.0.0 like player)
+                    geometryEngineVersion,                            // geometryDataEngineVersion
                     false,                                            // premiumSkin
                     false,                                            // personaSkin
                     false,                                            // personaCapeOnClassicSkin
@@ -227,6 +236,9 @@ public class SkinUtil {
             Path skinJson = skinFile.getParent().resolve(baseSkinName + ".json");
             String geometryData = STEVE_GEOMETRY;
             String resourcePatch = isSlim ? GEOMETRY_CUSTOM_SLIM : GEOMETRY_CUSTOM;
+            // For regular skins: use "0.0.0" (like player)
+            // For 4D skins: use actual format version (like RsNPC)
+            String geometryEngineVersion = "0.0.0";
 
             if (Files.exists(skinJson)) {
                 try {
@@ -242,6 +254,8 @@ public class SkinUtil {
                                 skinId = baseSkinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
                                 geometryData = customGeometry;
+                                // Use actual format version for 4D skins (like RsNPC)
+                                geometryEngineVersion = formatVersion;
                             }
                             break;
                         default:
@@ -252,6 +266,8 @@ public class SkinUtil {
                                 skinId = baseSkinName + "_" + UUID.randomUUID().toString().substring(0, 8);
                                 resourcePatch = "{\"geometry\":{\"default\":\"" + geometryName + "\"}}";
                                 geometryData = customGeometry;
+                                // Use actual format version for 4D skins (like RsNPC)
+                                geometryEngineVersion = formatVersion;
                             }
                             break;
                     }
@@ -260,7 +276,7 @@ public class SkinUtil {
                 }
             }
 
-            // Build Skin object (matching player skin values)
+            // Build Skin object
             Skin skin = new Skin(
                     skinId,                                           // skinId
                     null,                                             // playFabId (null like player)
@@ -270,7 +286,7 @@ public class SkinUtil {
                     Skin.ImageData.EMPTY,                             // capeData
                     geometryData,                                     // skinGeometry
                     null,                                             // animationData (null like player)
-                    "0.0.0",                                          // geometryDataEngineVersion (0.0.0 like player)
+                    geometryEngineVersion,                            // geometryDataEngineVersion
                     false,                                            // premiumSkin
                     false,                                            // personaSkin
                     false,                                            // personaCapeOnClassicSkin
