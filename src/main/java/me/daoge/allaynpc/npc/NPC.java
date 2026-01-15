@@ -8,6 +8,7 @@ import org.allaymc.api.container.ContainerTypes;
 import org.allaymc.api.entity.EntityInitInfo;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.entity.type.EntityTypes;
+import org.allaymc.api.player.Player;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.math.location.Location3d;
 import org.allaymc.api.math.location.Location3dc;
@@ -337,7 +338,12 @@ public class NPC {
         double maxDistSq = 32.0 * 32.0;
 
         for (var viewer : entity.getViewers()) {
-            if (!(viewer instanceof EntityPlayer playerEntity)) continue;
+            // viewer is WorldViewer (Player), not EntityPlayer
+            // Need to get the controlled EntityPlayer from Player
+            if (!(viewer instanceof Player player)) continue;
+
+            EntityPlayer playerEntity = player.getControlledEntity();
+            if (playerEntity == null) continue;
 
             Location3dc playerLoc = playerEntity.getLocation();
             double dx = playerLoc.x() - npcLoc.x();
