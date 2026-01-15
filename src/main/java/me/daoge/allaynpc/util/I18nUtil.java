@@ -44,8 +44,8 @@ public class I18nUtil {
      * @return the sender's language code, or server default if not a player
      */
     public static LangCode getLangCode(CommandSender sender) {
-        if (sender instanceof Player player) {
-            return player.getLoginData().getLangCode();
+        if (sender instanceof EntityPlayer entity && entity.isActualPlayer()) {
+            return entity.getController().getLoginData().getLangCode();
         }
         return I18n.get().getDefaultLangCode();
     }
