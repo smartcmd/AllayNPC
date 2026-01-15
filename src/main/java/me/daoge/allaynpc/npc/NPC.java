@@ -310,32 +310,13 @@ public class NPC {
     }
 
     /**
-     * Look at the nearest player within range
+     * Make NPC look at all viewers individually.
+     * Each player will see the NPC looking directly at them using WorldViewer.viewEntityLocation().
      */
     public void lookAtNearestPlayer() {
         if (!isSpawned() || !config.isLookAtPlayer()) return;
 
-        EntityPlayer nearestPlayer = findNearestPlayer();
-        if (nearestPlayer != null) {
-            lookAt(nearestPlayer);
-        }
-    }
-
-    /**
-     * Find the nearest player to this NPC
-     *
-     * @return nearest player, null if none found
-     */
-    @Nullable
-    private EntityPlayer findNearestPlayer() {
-        if (entity == null) return null;
-
         Location3dc npcLoc = entity.getLocation();
-        EntityPlayer nearest = null;
-        double nearestDistSq = Double.MAX_VALUE;
-
-        // Search within 32 blocks among viewers
-        double maxDistSq = 32.0 * 32.0;
 
         for (var viewer : entity.getViewers()) {
             // viewer is WorldViewer (Player), not EntityPlayer
@@ -345,63 +326,41 @@ public class NPC {
             EntityPlayer playerEntity = player.getControlledEntity();
             if (playerEntity == null) continue;
 
-            Location3dc playerLoc = playerEntity.getLocation();
-            double dx = playerLoc.x() - npcLoc.x();
-            double dy = playerLoc.y() - npcLoc.y();
-            double dz = playerLoc.z() - npcLoc.z();
-            double distSq = dx * dx + dy * dy + dz * dz;
+            try {
+                Location3dc playerLoc = playerEntity.getLocation();
 
-            if (distSq < maxDistSq && distSq < nearestDistSq) {
-                nearestDistSq = distSq;
-                nearest = playerEntity;
+                // Calculate direction vector (target at player's eye level)
+                double dx = playerLoc.x() - npcLoc.x();
+                double dy = (playerLoc.y() + 1.62) - (npcLoc.y() + 1.62); // Eye level
+                double dz = playerLoc.z() - npcLoc.z();
+
+                // Calculate horizontal distance
+                double horizontalDist = Math.sqrt(dx * dx + dz * dz);
+
+                // Calculate yaw (horizontal rotation)
+                // In Minecraft, yaw 0 is south (+Z), and increases counterclockwise
+                double yaw = Math.toDegrees(Math.atan2(-dx, dz));
+
+                // Calculate pitch (vertical rotation)
+                double pitch = -Math.toDegrees(Math.atan2(dy, horizontalDist));
+
+                // Clamp pitch to prevent extreme angles
+                pitch = Math.max(-89, Math.min(89, pitch));
+
+                // Create location with updated rotation for this specific viewer
+                Location3d viewLocation = new Location3d(
+                        npcLoc.x(), npcLoc.y(), npcLoc.z(),
+                        pitch, yaw,
+                        npcLoc.dimension()
+                );
+
+                // Send individualized location to this viewer only
+                // The lastSentLocation is passed as a new object to avoid modifying the actual entity state
+                player.viewEntityLocation(entity, new Location3d(npcLoc), viewLocation, false);
+
+            } catch (Exception e) {
+                log.warn("Failed to update look direction for viewer {} on NPC {}", player.getOriginName(), config.getName(), e);
             }
-        }
-
-        return nearest;
-    }
-
-    /**
-     * Look at specified player
-     *
-     * @param player target player
-     */
-    public void lookAt(EntityPlayer player) {
-        if (!isSpawned() || !config.isLookAtPlayer()) return;
-
-        try {
-            Location3dc npcLoc = entity.getLocation();
-            Location3dc playerLoc = player.getLocation();
-
-            // Calculate direction vector (target at player's eye level)
-            double dx = playerLoc.x() - npcLoc.x();
-            double dy = (playerLoc.y() + 1.62) - (npcLoc.y() + 1.62); // Eye level
-            double dz = playerLoc.z() - npcLoc.z();
-
-            // Calculate horizontal distance
-            double horizontalDist = Math.sqrt(dx * dx + dz * dz);
-
-            // Calculate yaw (horizontal rotation)
-            // In Minecraft, yaw 0 is south (+Z), and increases counterclockwise
-            double yaw = Math.toDegrees(Math.atan2(-dx, dz));
-
-            // Calculate pitch (vertical rotation)
-            double pitch = -Math.toDegrees(Math.atan2(dy, horizontalDist));
-
-            // Clamp pitch to prevent extreme angles
-            pitch = Math.max(-89, Math.min(89, pitch));
-
-            // Create new location with updated rotation only
-            Location3d newLoc = new Location3d(
-                    npcLoc.x(), npcLoc.y(), npcLoc.z(),
-                    pitch, yaw,
-                    npcLoc.dimension()
-            );
-
-            // Update entity location (teleport handles broadcasting)
-            entity.teleport(newLoc);
-
-        } catch (Exception e) {
-            log.warn("Failed to look at player for NPC {}", config.getName(), e);
         }
     }
 

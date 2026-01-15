@@ -15,7 +15,7 @@
 ## ✨ Features
 
 - 🎭 **Custom Skins** - Support for custom player skins and 4D skins
-- 👀 **Look at Player** - NPCs can automatically look at nearby players
+- 👀 **Look at Player** - NPCs automatically look at each player individually (per-player view)
 - 🎬 **Emote Support** - NPCs can play emotes at configurable intervals
 - ⚔️ **Equipment System** - Full armor and held item support
 - 💬 **Dialog System** - Create interactive dialogs with buttons
@@ -137,7 +137,7 @@ armor:
   leggings: "minecraft:diamond_leggings"
   boots: "minecraft:diamond_boots"
 
-# Whether NPC should look at nearest player
+# Whether NPC should look at players (each player sees NPC looking at them)
 look_at_player: true
 
 # Emote configuration
@@ -168,7 +168,7 @@ actions:
 | `display_name` | String | `"NPC"` | Name shown above NPC (supports `&` color codes) |
 | `always_show_name` | Boolean | `true` | Always show the name tag |
 | `skin` | String | `""` | Skin name (filename or folder name) |
-| `look_at_player` | Boolean | `true` | Look at nearest player |
+| `look_at_player` | Boolean | `true` | NPC looks at each player individually (per-player) |
 | `held_item` | String | `""` | Item ID for held item |
 | `click_cooldown` | Integer | `20` | Cooldown between clicks (ticks) |
 
