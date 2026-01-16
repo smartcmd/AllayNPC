@@ -126,6 +126,9 @@ armor:
 # Whether NPC should look at players (each player sees NPC looking at them)
 look_at_player: true
 
+# NPC scale (1.0 = normal size, 0.5 = half size, 2.0 = double size)
+scale: 1.0
+
 # Emote configuration
 emote:
   # Emote UUID (leave empty to disable)
@@ -155,6 +158,7 @@ actions:
 | `always_show_name` | Boolean | `true`  | Always show the name tag                           |
 | `skin`             | String  | `""`    | Skin name (filename or folder name)                |
 | `look_at_player`   | Boolean | `true`  | NPC looks at each player individually (per-player) |
+| `scale`            | Double  | `1.0`   | NPC scale (0.5 = half, 1.0 = normal, 2.0 = double) |
 | `held_item`        | String  | `""`    | Item ID for held item                              |
 | `click_cooldown`   | Integer | `20`    | Cooldown between clicks (ticks)                    |
 

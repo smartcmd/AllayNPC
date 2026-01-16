@@ -64,6 +64,12 @@ public class NPCConfig {
     private boolean lookAtPlayer = true;
 
     /**
+     * NPC scale (1.0 = normal size)
+     */
+    @Builder.Default
+    private double scale = 1.0;
+
+    /**
      * Emote action configuration
      */
     @Builder.Default

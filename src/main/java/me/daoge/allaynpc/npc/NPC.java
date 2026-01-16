@@ -120,6 +120,9 @@ public class NPC {
             // Set gamemode to survival so EntityDamageEvent can be triggered
             entity.setGameMode(GameMode.SURVIVAL);
 
+            // Apply scale
+            entity.setScale(config.getScale());
+
             // Apply skin BEFORE spawning
             applySkin();
 
