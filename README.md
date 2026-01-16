@@ -1,16 +1,14 @@
 <div align="center">
 
-# 🤖 AllayNPC
+# AllayNPC
 
-![AllayMC](https://img.shields.io/badge/AllayMC-0.22.0-blue?style=for-the-badge)
+![AllayMC](https://img.shields.io/badge/AllayMC-0.23.0-blue?style=for-the-badge)
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **A powerful NPC plugin for AllayMC** 🎮
 
 </div>
-
----
 
 ## ✨ Features
 
@@ -25,16 +23,12 @@
 - 🔄 **Hot Reload** - Reload configurations without server restart
 - 🎨 **PlaceholderAPI** - Full placeholder support in messages
 
----
-
 ## 📦 Installation
 
 1. Download the latest release from [Releases](https://github.com/smartcmd/AllayNPC/releases)
 2. Place the JAR file in your server's `plugins` folder
 3. Restart the server
 4. Done! 🎉
-
----
 
 ## 🎮 Commands
 
@@ -53,15 +47,11 @@
 
 **Alias:** `/npc`
 
----
-
 ## 🔐 Permissions
 
 | Permission | Description |
 |------------|-------------|
 | `allaynpc.command` | Access to all NPC commands |
-
----
 
 ## 📁 Directory Structure
 
@@ -79,8 +69,6 @@ plugins/AllayNPC/
 │   └── welcome.yml
 └── 📂 lang/               # Language files
 ```
-
----
 
 ## 🎭 Skin Setup
 
@@ -101,8 +89,6 @@ AllayNPC supports two ways to add custom skins:
 - 4D skins: Various sizes with custom geometry
 
 After adding skins, use `/anpc reload` to load them.
-
----
 
 ## 📝 NPC Configuration
 
@@ -163,16 +149,14 @@ actions:
 
 ### 📋 Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `display_name` | String | `"NPC"` | Name shown above NPC (supports `&` color codes) |
-| `always_show_name` | Boolean | `true` | Always show the name tag |
-| `skin` | String | `""` | Skin name (filename or folder name) |
-| `look_at_player` | Boolean | `true` | NPC looks at each player individually (per-player) |
-| `held_item` | String | `""` | Item ID for held item |
-| `click_cooldown` | Integer | `20` | Cooldown between clicks (ticks) |
-
----
+| Option             | Type    | Default | Description                                        |
+|--------------------|---------|---------|----------------------------------------------------|
+| `display_name`     | String  | `"NPC"` | Name shown above NPC (supports `&` color codes)    |
+| `always_show_name` | Boolean | `true`  | Always show the name tag                           |
+| `skin`             | String  | `""`    | Skin name (filename or folder name)                |
+| `look_at_player`   | Boolean | `true`  | NPC looks at each player individually (per-player) |
+| `held_item`        | String  | `""`    | Item ID for held item                              |
+| `click_cooldown`   | Integer | `20`    | Cooldown between clicks (ticks)                    |
 
 ## 💬 Dialog Configuration
 
@@ -211,15 +195,13 @@ buttons:
     message: "&7Come back soon!"
 ```
 
----
-
 ## 🎯 Action Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `command` | Execute a command | `give {player_name} diamond 1` |
-| `message` | Send a message to player | `&aWelcome!` |
-| `dialog` | Open a dialog | `shop_menu` |
+| Type      | Description              | Example                        |
+|-----------|--------------------------|--------------------------------|
+| `command` | Execute a command        | `give {player_name} diamond 1` |
+| `message` | Send a message to player | `&aWelcome!`                   |
+| `dialog`  | Open a dialog            | `shop_menu`                    |
 
 ### 📌 Action Options
 
@@ -227,21 +209,17 @@ buttons:
   - `true`: Player runs the command
   - `false`: Console runs the command
 
----
-
 ## 🎬 Emotes
 
 NPCs can play emotes at regular intervals. Use the emote UUID from Minecraft Bedrock Edition.
 
 ### Popular Emote UUIDs
 
-| Emote | UUID |
-|-------|------|
-| Wave | `4c8ae710-df2e-47cd-814d-cc7bf21a3d67` |
+| Emote       | UUID                                   |
+|-------------|----------------------------------------|
+| Wave        | `4c8ae710-df2e-47cd-814d-cc7bf21a3d67` |
 | Simple Clap | `9a469a61-c83b-4ba9-b507-bdbe64430f72` |
-| Over There | `ce5c0300-7f03-455d-aaf1-352e4927b54d` |
-
----
+| Over There  | `ce5c0300-7f03-455d-aaf1-352e4927b54d` |
 
 ## 🌍 Placeholders
 
@@ -253,34 +231,28 @@ AllayNPC supports [PlaceholderAPI](https://github.com/AzaleeX/PlaceholderAPI) pl
 - `{max_online}` - Max player count
 - And all other PAPI placeholders...
 
----
-
 ## 🎨 Color Codes
 
 Use `&` for color codes in display names and messages:
 
-| Code | Color | Code | Color |
-|------|-------|------|-------|
-| `&0` | Black | `&8` | Dark Gray |
-| `&1` | Dark Blue | `&9` | Blue |
-| `&2` | Dark Green | `&a` | Green |
-| `&3` | Dark Aqua | `&b` | Aqua |
-| `&4` | Dark Red | `&c` | Red |
+| Code | Color       | Code | Color        |
+|------|-------------|------|--------------|
+| `&0` | Black       | `&8` | Dark Gray    |
+| `&1` | Dark Blue   | `&9` | Blue         |
+| `&2` | Dark Green  | `&a` | Green        |
+| `&3` | Dark Aqua   | `&b` | Aqua         |
+| `&4` | Dark Red    | `&c` | Red          |
 | `&5` | Dark Purple | `&d` | Light Purple |
-| `&6` | Gold | `&e` | Yellow |
-| `&7` | Gray | `&f` | White |
+| `&6` | Gold        | `&e` | Yellow       |
+| `&7` | Gray        | `&f` | White        |
 
 **Formatting:** `&l` Bold, `&o` Italic, `&n` Underline, `&r` Reset
 
----
-
 ## 🔧 Dependencies
 
-| Plugin | Required | Description |
-|--------|----------|-------------|
-| [PlaceholderAPI](https://github.com/AzaleeX/PlaceholderAPI) | ✅ Yes | Placeholder support |
-
----
+| Plugin                                                      | Required | Description         |
+|-------------------------------------------------------------|----------|---------------------|
+| [PlaceholderAPI](https://github.com/AzaleeX/PlaceholderAPI) | ✅ Yes    | Placeholder support |
 
 ## 🛠️ Building
 
@@ -295,13 +267,9 @@ cd AllayNPC
 # Output: build/libs/AllayNPC-*-shaded.jar
 ```
 
----
-
 ## 📄 License
 
 This project is licensed under the MIT License.
-
----
 
 ## 🤝 Contributing
 
@@ -310,8 +278,6 @@ Contributions are welcome! Feel free to:
 - 🐛 Report bugs
 - 💡 Suggest features
 - 🔧 Submit pull requests
-
----
 
 <div align="center">
 
