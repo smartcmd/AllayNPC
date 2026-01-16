@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="logo.svg" alt="AllayNPC Logo"/>
+
 # AllayNPC
 
 ![AllayMC](https://img.shields.io/badge/AllayMC-0.23.0-blue?style=for-the-badge)
