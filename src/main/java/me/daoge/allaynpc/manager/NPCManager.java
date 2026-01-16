@@ -133,8 +133,11 @@ public class NPCManager {
                 .displayName(getString(data, "display_name", "NPC"))
                 .alwaysShowName(getBoolean(data, "always_show_name", true))
                 .skin(getString(data, "skin", ""))
+                .cape(getString(data, "cape", ""))
                 .heldItem(getString(data, "held_item", ""))
                 .lookAtPlayer(getBoolean(data, "look_at_player", true))
+                .scale(getDouble(data, "scale", 1.0))
+                .scoreTag(getString(data, "score_tag", ""))
                 .clickCooldown(getInt(data, "click_cooldown", 20));
 
         // Parse position
@@ -243,6 +246,7 @@ public class NPCManager {
         data.put("display_name", config.getDisplayName());
         data.put("always_show_name", config.isAlwaysShowName());
         data.put("skin", config.getSkin());
+        data.put("cape", config.getCape());
 
         // Position
         if (config.getPosition() != null) {
@@ -269,6 +273,8 @@ public class NPCManager {
         }
 
         data.put("look_at_player", config.isLookAtPlayer());
+        data.put("scale", config.getScale());
+        data.put("score_tag", config.getScoreTag());
 
         // Emote
         if (config.getEmote() != null && config.getEmote().isEnabled()) {

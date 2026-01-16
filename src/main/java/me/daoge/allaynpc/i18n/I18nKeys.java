@@ -21,16 +21,18 @@ public class I18nKeys {
 
     // Directory creation
     public static final String DIRECTORY_SKINS_CREATED = "allaynpc:directory.skins.created";
+    public static final String DIRECTORY_CAPES_CREATED = "allaynpc:directory.capes.created";
     public static final String DIRECTORY_DIALOGS_CREATED = "allaynpc:directory.dialogs.created";
     public static final String DIRECTORY_NPCS_CREATED = "allaynpc:directory.npcs.created";
-    public static final String DIRECTORY_LANG_CREATED = "allaynpc:directory.lang.created";
     public static final String DIRECTORY_CREATE_FAILED = "allaynpc:directory.create.failed";
 
     // Manager messages
     public static final String MANAGER_SKINS_LOADED = "allaynpc:manager.skins.loaded";
+    public static final String MANAGER_CAPES_LOADED = "allaynpc:manager.capes.loaded";
     public static final String MANAGER_DIALOGS_LOADED = "allaynpc:manager.dialogs.loaded";
     public static final String MANAGER_NPCS_LOADED = "allaynpc:manager.npcs.loaded";
     public static final String MANAGER_SKINS_RELOADED = "allaynpc:manager.skins.reloaded";
+    public static final String MANAGER_CAPES_RELOADED = "allaynpc:manager.capes.reloaded";
     public static final String MANAGER_DIALOGS_RELOADED = "allaynpc:manager.dialogs.reloaded";
     public static final String MANAGER_NPCS_RELOADED = "allaynpc:manager.npcs.reloaded";
 

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.NPCConfig;
+import me.daoge.allaynpc.util.PlaceholderUtil;
 import org.allaymc.api.container.ContainerTypes;
 import org.allaymc.api.entity.EntityInitInfo;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
@@ -132,6 +133,9 @@ public class NPC {
             // Apply armor
             applyArmor();
 
+            // Apply score tag
+            applyScoreTag();
+
             // Add entity to world (engine handles spawning to players automatically)
             dimension.getEntityManager().addEntity(entity, () -> {
                 log.debug("NPC {} spawned at {} in world {}", config.getName(), pos.toVector3d(), pos.getWorld());
@@ -176,7 +180,7 @@ public class NPC {
     }
 
     /**
-     * Apply skin to NPC
+     * Apply skin and cape to NPC
      */
     private void applySkin() {
         if (entity == null) return;
@@ -191,6 +195,18 @@ public class NPC {
         }
 
         if (skin != null) {
+            // Apply cape if configured
+            String capeName = config.getCape();
+            if (capeName != null && !capeName.isEmpty()) {
+                Skin.ImageData capeData = AllayNPC.getInstance().getCapeManager().getCape(capeName);
+                if (capeData != null) {
+                    skin = skin.toBuilder()
+                            .capeData(capeData)
+                            .capeId(UUID.randomUUID().toString())
+                            .build();
+                }
+            }
+
             entity.setSkin(skin);
         }
     }
@@ -285,6 +301,77 @@ public class NPC {
             log.warn("Invalid item ID: {}", itemId);
         }
         return null;
+    }
+
+    /**
+     * Update display name with PAPI placeholders
+     * Should be called periodically if displayName contains placeholders
+     */
+    public void updateDisplayName() {
+        if (!isSpawned()) return;
+
+        String displayName = config.getDisplayName();
+        if (displayName == null || displayName.isEmpty()) {
+            return;
+        }
+
+        // Parse PAPI placeholders and color codes
+        String parsed = PlaceholderUtil.parse(null, displayName);
+        String colorized = TextFormat.colorize(parsed);
+        entity.setDisplayName(colorized);
+        entity.setNameTag(colorized);
+    }
+
+    /**
+     * Check if NPC display name contains PAPI placeholders
+     *
+     * @return true if display name contains placeholders
+     */
+    public boolean hasDisplayNamePlaceholders() {
+        String displayName = config.getDisplayName();
+        return displayName != null && PlaceholderUtil.containsPlaceholders(displayName);
+    }
+
+    /**
+     * Apply score tag to NPC (initial application without PAPI)
+     */
+    private void applyScoreTag() {
+        if (entity == null) return;
+
+        String scoreTag = config.getScoreTag();
+        if (scoreTag == null || scoreTag.isEmpty()) {
+            return;
+        }
+
+        // Apply with color codes only (PAPI will be handled in updateScoreTag)
+        entity.setScoreTag(TextFormat.colorize(scoreTag));
+    }
+
+    /**
+     * Update score tag with PAPI placeholders
+     * Should be called periodically if scoreTag contains placeholders
+     */
+    public void updateScoreTag() {
+        if (!isSpawned()) return;
+
+        String scoreTag = config.getScoreTag();
+        if (scoreTag == null || scoreTag.isEmpty()) {
+            return;
+        }
+
+        // Parse PAPI placeholders (using null for global placeholders like {online}, {max_online})
+        String parsed = PlaceholderUtil.parse(null, scoreTag);
+        entity.setScoreTag(TextFormat.colorize(parsed));
+    }
+
+    /**
+     * Check if NPC has score tag configured
+     *
+     * @return true if score tag is configured
+     */
+    public boolean hasScoreTag() {
+        String scoreTag = config.getScoreTag();
+        return scoreTag != null && !scoreTag.isEmpty();
     }
 
     /**

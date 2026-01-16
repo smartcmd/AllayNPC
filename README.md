@@ -63,11 +63,12 @@ plugins/AllayNPC/
 │   └── 📂 custom4d/       # 4D skin folder
 │       ├── skin.png       # or skin_slim.png
 │       └── skin.json      # Geometry data (optional)
+├── 📂 capes/              # Cape files
+│   └── cool_cape.png      # Cape file (filename = cape ID)
 ├── 📂 npcs/               # NPC configurations (.yml)
 │   └── shopkeeper.yml
-├── 📂 dialogs/            # Dialog configurations (.yml)
-│   └── welcome.yml
-└── 📂 lang/               # Language files
+└── 📂 dialogs/            # Dialog configurations (.yml)
+    └── welcome.yml
 ```
 
 ## 🎭 Skin Setup
@@ -90,6 +91,16 @@ AllayNPC supports two ways to add custom skins:
 
 After adding skins, use `/anpc reload` to load them.
 
+## 🧥 Cape Setup
+
+Place cape PNG files in `plugins/AllayNPC/capes/` directory. The filename (without extension) becomes the cape ID.
+
+### Supported Format
+- Standard cape size: 64x32 pixels
+- PNG format
+
+After adding capes, use `/anpc reload` to load them.
+
 ## 📝 NPC Configuration
 
 Example NPC configuration (`npcs/shopkeeper.yml`):
@@ -103,6 +114,9 @@ always_show_name: true
 
 # Skin name (filename without extension, or folder name)
 skin: "custom_skin"
+
+# Cape name (filename without extension from capes/ folder)
+cape: "cool_cape"
 
 # NPC position
 position:
@@ -129,6 +143,9 @@ look_at_player: true
 # NPC scale (1.0 = normal size, 0.5 = half size, 2.0 = double size)
 scale: 1.0
 
+# Score tag (displayed below name tag, supports color codes and PAPI)
+score_tag: "&7Online: &a{online}&7/&a{max_online}"
+
 # Emote configuration
 emote:
   # Emote UUID (leave empty to disable)
@@ -154,11 +171,13 @@ actions:
 
 | Option             | Type    | Default | Description                                        |
 |--------------------|---------|---------|----------------------------------------------------|
-| `display_name`     | String  | `"NPC"` | Name shown above NPC (supports `&` color codes)    |
+| `display_name`     | String  | `"NPC"` | Name shown above NPC (supports color codes & PAPI) |
 | `always_show_name` | Boolean | `true`  | Always show the name tag                           |
 | `skin`             | String  | `""`    | Skin name (filename or folder name)                |
+| `cape`             | String  | `""`    | Cape name (filename from capes/ folder)            |
 | `look_at_player`   | Boolean | `true`  | NPC looks at each player individually (per-player) |
 | `scale`            | Double  | `1.0`   | NPC scale (0.5 = half, 1.0 = normal, 2.0 = double) |
+| `score_tag`        | String  | `""`    | Text below name tag (supports color codes & PAPI)  |
 | `held_item`        | String  | `""`    | Item ID for held item                              |
 | `click_cooldown`   | Integer | `20`    | Cooldown between clicks (ticks)                    |
 

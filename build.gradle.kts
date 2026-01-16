@@ -14,7 +14,7 @@ java {
 }
 
 allay {
-    api = "0.22.0"
+    api = "0.23.0-SNAPSHOT"
 
     plugin {
         entrance = ".AllayNPC"

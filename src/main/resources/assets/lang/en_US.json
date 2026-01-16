@@ -8,15 +8,17 @@
   "allaynpc:plugin.reloaded": "AllayNPC reloaded successfully!",
 
   "allaynpc:directory.skins.created": "Created skins directory",
+  "allaynpc:directory.capes.created": "Created capes directory",
   "allaynpc:directory.dialogs.created": "Created dialogs directory",
   "allaynpc:directory.npcs.created": "Created npcs directory",
-  "allaynpc:directory.lang.created": "Created lang directory",
   "allaynpc:directory.create.failed": "Failed to create data directories",
 
   "allaynpc:manager.skins.loaded": "Loaded %1 skins",
+  "allaynpc:manager.capes.loaded": "Loaded %1 capes",
   "allaynpc:manager.dialogs.loaded": "Loaded %1 dialogs",
   "allaynpc:manager.npcs.loaded": "Loaded %1 NPC configs",
   "allaynpc:manager.skins.reloaded": "Reloaded %1 skins",
+  "allaynpc:manager.capes.reloaded": "Reloaded %1 capes",
   "allaynpc:manager.dialogs.reloaded": "Reloaded %1 dialogs",
   "allaynpc:manager.npcs.reloaded": "Reloaded %1 NPC configs",
 

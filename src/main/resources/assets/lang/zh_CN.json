@@ -8,15 +8,17 @@
   "allaynpc:plugin.reloaded": "AllayNPC 重载成功！",
 
   "allaynpc:directory.skins.created": "已创建皮肤目录",
+  "allaynpc:directory.capes.created": "已创建披风目录",
   "allaynpc:directory.dialogs.created": "已创建对话目录",
   "allaynpc:directory.npcs.created": "已创建 NPC 目录",
-  "allaynpc:directory.lang.created": "已创建语言目录",
   "allaynpc:directory.create.failed": "创建数据目录失败",
 
   "allaynpc:manager.skins.loaded": "已加载 %1 个皮肤",
+  "allaynpc:manager.capes.loaded": "已加载 %1 个披风",
   "allaynpc:manager.dialogs.loaded": "已加载 %1 个对话",
   "allaynpc:manager.npcs.loaded": "已加载 %1 个 NPC 配置",
   "allaynpc:manager.skins.reloaded": "已重载 %1 个皮肤",
+  "allaynpc:manager.capes.reloaded": "已重载 %1 个披风",
   "allaynpc:manager.dialogs.reloaded": "已重载 %1 个对话",
   "allaynpc:manager.npcs.reloaded": "已重载 %1 个 NPC 配置",
 

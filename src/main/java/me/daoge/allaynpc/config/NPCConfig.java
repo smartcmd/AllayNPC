@@ -41,6 +41,12 @@ public class NPCConfig {
     private String skin = "";
 
     /**
+     * Cape name (cape ID, references a cape file in capes/ directory)
+     */
+    @Builder.Default
+    private String cape = "";
+
+    /**
      * Position information
      */
     private PositionConfig position;
@@ -68,6 +74,12 @@ public class NPCConfig {
      */
     @Builder.Default
     private double scale = 1.0;
+
+    /**
+     * Score tag (displayed below name tag, supports color codes and PAPI)
+     */
+    @Builder.Default
+    private String scoreTag = "";
 
     /**
      * Emote action configuration

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.command.ANPCCommand;
 import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.listener.NPCEventListener;
+import me.daoge.allaynpc.manager.CapeManager;
 import me.daoge.allaynpc.manager.DialogManager;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.manager.SkinManager;
@@ -37,6 +38,9 @@ public class AllayNPC extends Plugin {
 
     @Getter
     private SkinManager skinManager;
+
+    @Getter
+    private CapeManager capeManager;
 
     @Getter
     private DialogManager dialogManager;
@@ -109,6 +113,13 @@ public class AllayNPC extends Plugin {
                 log.info(I18n.get().tr(I18nKeys.DIRECTORY_SKINS_CREATED));
             }
 
+            // Create capes directory
+            Path capesDir = dataFolder.resolve("capes");
+            if (!Files.exists(capesDir)) {
+                Files.createDirectories(capesDir);
+                log.info(I18n.get().tr(I18nKeys.DIRECTORY_CAPES_CREATED));
+            }
+
             // Create dialogs directory
             Path dialogsDir = dataFolder.resolve("dialogs");
             if (!Files.exists(dialogsDir)) {
@@ -121,13 +132,6 @@ public class AllayNPC extends Plugin {
             if (!Files.exists(npcsDir)) {
                 Files.createDirectories(npcsDir);
                 log.info(I18n.get().tr(I18nKeys.DIRECTORY_NPCS_CREATED));
-            }
-
-            // Create lang directory
-            Path langDir = dataFolder.resolve("lang");
-            if (!Files.exists(langDir)) {
-                Files.createDirectories(langDir);
-                log.info(I18n.get().tr(I18nKeys.DIRECTORY_LANG_CREATED));
             }
 
         } catch (IOException e) {
@@ -145,6 +149,11 @@ public class AllayNPC extends Plugin {
         skinManager = new SkinManager(dataFolder.resolve("skins"));
         skinManager.loadAllSkins();
         log.info(I18n.get().tr(I18nKeys.MANAGER_SKINS_LOADED, skinManager.getSkinCount()));
+
+        // Initialize cape manager
+        capeManager = new CapeManager(dataFolder.resolve("capes"));
+        capeManager.loadAllCapes();
+        log.info(I18n.get().tr(I18nKeys.MANAGER_CAPES_LOADED, capeManager.getCapeCount()));
 
         // Initialize dialog manager
         dialogManager = new DialogManager(dataFolder.resolve("dialogs"));
@@ -197,7 +206,7 @@ public class AllayNPC extends Plugin {
     }
 
     /**
-     * Update all NPCs (look-at-player and emotes)
+     * Update all NPCs (look-at-player, emotes, and score tags)
      */
     private void updateNPCs() {
         for (NPC npc : npcManager.getSpawnedNPCs()) {
@@ -208,6 +217,16 @@ public class AllayNPC extends Plugin {
                 // Check and play emotes
                 if (npc.shouldPlayEmote(currentTick)) {
                     npc.playEmote();
+                }
+
+                // Update display name and score tags every second (20 ticks) for PAPI support
+                if (currentTick % 20 == 0) {
+                    if (npc.hasDisplayNamePlaceholders()) {
+                        npc.updateDisplayName();
+                    }
+                    if (npc.hasScoreTag()) {
+                        npc.updateScoreTag();
+                    }
                 }
             } catch (Exception e) {
                 log.warn(I18n.get().tr(I18nKeys.NPC_UPDATE_ERROR, npc.getName(), e.getMessage()));
@@ -232,6 +251,10 @@ public class AllayNPC extends Plugin {
         // Reload skins
         skinManager.loadAllSkins();
         log.info(I18n.get().tr(I18nKeys.MANAGER_SKINS_RELOADED, skinManager.getSkinCount()));
+
+        // Reload capes
+        capeManager.loadAllCapes();
+        log.info(I18n.get().tr(I18nKeys.MANAGER_CAPES_RELOADED, capeManager.getCapeCount()));
 
         // Reload dialogs
         dialogManager.loadAllDialogs();
