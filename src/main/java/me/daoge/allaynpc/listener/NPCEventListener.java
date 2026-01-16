@@ -13,6 +13,8 @@ import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.eventbus.EventHandler;
 import org.allaymc.api.eventbus.event.entity.EntityDamageEvent;
 import org.allaymc.api.eventbus.event.player.PlayerInteractEntityEvent;
+import org.allaymc.api.eventbus.event.player.PlayerPickupArrowEvent;
+import org.allaymc.api.eventbus.event.player.PlayerPickupItemEvent;
 import org.allaymc.api.eventbus.event.world.WorldLoadEvent;
 import org.allaymc.api.eventbus.event.world.WorldUnloadEvent;
 
@@ -141,6 +143,40 @@ public class NPCEventListener {
             case DIALOG -> new DialogAction(config.getValue());
             case MESSAGE -> new MessageAction(config.getValue());
         };
+    }
+
+    /**
+     * Handle player pickup item event
+     * Prevent NPC from picking up items
+     *
+     * @param event event object
+     */
+    @EventHandler
+    private void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        EntityPlayer player = event.getPlayer();
+
+        // Check if the picker is an NPC
+        NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        if (npcManager.getNPCByEntity(player) != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Handle player pickup arrow event
+     * Prevent NPC from picking up arrows
+     *
+     * @param event event object
+     */
+    @EventHandler
+    private void onPlayerPickupArrow(PlayerPickupArrowEvent event) {
+        EntityPlayer player = event.getPlayer();
+
+        // Check if the picker is an NPC
+        NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
+        if (npcManager.getNPCByEntity(player) != null) {
+            event.setCancelled(true);
+        }
     }
 
     /**
