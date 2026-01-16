@@ -246,6 +246,8 @@ NPCs can play emotes at regular intervals. Use the emote UUID from Minecraft Bed
 | Simple Clap | `9a469a61-c83b-4ba9-b507-bdbe64430f72` |
 | Over There  | `ce5c0300-7f03-455d-aaf1-352e4927b54d` |
 
+For a complete list of all available emote UUIDs, see [Bedrock-Emotes](https://github.com/TwistedAsylumMC/Bedrock-Emotes).
+
 ## 🌍 Placeholders
 
 AllayNPC supports [PlaceholderAPI](https://github.com/AzaleeX/PlaceholderAPI) placeholders in messages, dialog text, and commands:
