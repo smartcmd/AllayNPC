@@ -5,8 +5,11 @@ import me.daoge.allaynpc.config.DialogConfig;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
+import org.yaml.snakeyaml.DumperOptions;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -249,5 +252,100 @@ public class DialogManager {
     @Nullable
     public DialogConfig removeDialog(String name) {
         return dialogs.remove(name);
+    }
+
+    /**
+     * Save dialog config to file
+     *
+     * @param config dialog config to save
+     * @return true if saved successfully
+     */
+    public boolean saveDialogConfig(DialogConfig config) {
+        if (config == null || config.getName() == null || config.getName().isEmpty()) {
+            log.error("Cannot save dialog config: invalid config or name");
+            return false;
+        }
+
+        // Ensure dialogs directory exists
+        try {
+            if (!Files.exists(dialogsDirectory)) {
+                Files.createDirectories(dialogsDirectory);
+            }
+        } catch (IOException e) {
+            log.error("Failed to create dialogs directory: {}", dialogsDirectory, e);
+            return false;
+        }
+
+        Path filePath = dialogsDirectory.resolve(config.getName() + ".yml");
+
+        // Build YAML data
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("title", config.getTitle());
+        data.put("body", config.getBody());
+
+        List<Map<String, Object>> buttonsList = new ArrayList<>();
+        for (DialogConfig.ButtonConfig button : config.getButtons()) {
+            Map<String, Object> buttonData = new LinkedHashMap<>();
+            buttonData.put("text", button.getText());
+            if (!button.getCommands().isEmpty()) {
+                buttonData.put("commands", button.getCommands());
+            }
+            if (!button.getMessage().isEmpty()) {
+                buttonData.put("message", button.getMessage());
+            }
+            if (button.isAsPlayer()) {
+                buttonData.put("as_player", true);
+            }
+            buttonsList.add(buttonData);
+        }
+        data.put("buttons", buttonsList);
+
+        // Configure YAML dumper for readable output
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setPrettyFlow(true);
+        options.setIndent(2);
+        Yaml yaml = new Yaml(options);
+
+        try (Writer writer = Files.newBufferedWriter(filePath)) {
+            yaml.dump(data, writer);
+            log.info("Saved dialog config: {}", config.getName());
+            return true;
+        } catch (IOException e) {
+            log.error("Failed to save dialog config: {}", config.getName(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Delete dialog config file
+     *
+     * @param name dialog name
+     * @return true if deleted successfully
+     */
+    public boolean deleteDialogFile(String name) {
+        Path filePath = dialogsDirectory.resolve(name + ".yml");
+        try {
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                log.info("Deleted dialog file: {}", name);
+                return true;
+            } else {
+                log.warn("Dialog file does not exist: {}", name);
+                return false;
+            }
+        } catch (IOException e) {
+            log.error("Failed to delete dialog file: {}", name, e);
+            return false;
+        }
+    }
+
+    /**
+     * Get dialogs directory path
+     *
+     * @return dialogs directory path
+     */
+    public Path getDialogsDirectory() {
+        return dialogsDirectory;
     }
 }

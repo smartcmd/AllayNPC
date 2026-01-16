@@ -52,19 +52,14 @@ public class NPCEventListener {
     }
 
     /**
-     * Handle entity damage event (left-click attack)
+     * Handle entity damage event (left-click attack and all other damage sources)
+     * NPC is immune to all damage types
      *
      * @param event event object
      */
     @EventHandler
     private void onEntityDamage(EntityDamageEvent event) {
         var entity = event.getEntity();
-        var damageContainer = event.getDamageContainer();
-
-        // Check if the attacker is a player
-        if (!(damageContainer.getAttacker() instanceof EntityPlayer player)) {
-            return;
-        }
 
         // Get NPC manager
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
@@ -75,11 +70,14 @@ public class NPCEventListener {
             return;
         }
 
-        // Cancel damage to NPC
+        // Cancel ALL damage to NPC (immune to all damage types)
         event.setCancelled(true);
 
-        // Handle NPC click
-        handleNPCClick(player, npc);
+        // If the attacker is a player, handle NPC click
+        var damageContainer = event.getDamageContainer();
+        if (damageContainer.getAttacker() instanceof EntityPlayer player) {
+            handleNPCClick(player, npc);
+        }
     }
 
     /**

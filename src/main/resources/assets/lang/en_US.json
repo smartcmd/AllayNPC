@@ -57,6 +57,7 @@
   "allaynpc:command.help.remove": "/anpc remove <name> - Remove an NPC entity",
   "allaynpc:command.help.skins": "/anpc skins - List available skins",
   "allaynpc:command.help.reload": "/anpc reload - Reload configuration",
+  "allaynpc:command.help.dialog": "/anpc dialog - Manage dialogs",
 
   "allaynpc:form.create.title": "Create NPC: %1",
   "allaynpc:form.create.displayname": "Display Name",
@@ -129,5 +130,59 @@
   "allaynpc:form.action.delete": "Delete",
   "allaynpc:form.action.back": "Back",
 
-  "allaynpc:error.command.failed": "Command execution failed: %1"
+  "allaynpc:error.command.failed": "Command execution failed: %1",
+
+  "allaynpc:form.dialog.list.title": "Dialog Management",
+  "allaynpc:form.dialog.list.content": "Total dialogs: %1\nSelect a dialog to edit or create a new one:",
+  "allaynpc:form.dialog.create": "+ Create Dialog",
+
+  "allaynpc:form.dialog.create.title": "Create Dialog",
+  "allaynpc:form.dialog.name": "Dialog Name",
+  "allaynpc:form.dialog.name.placeholder": "Enter unique name (no spaces)...",
+  "allaynpc:form.dialog.title.field": "Dialog Title",
+  "allaynpc:form.dialog.title.placeholder": "Enter dialog title...",
+  "allaynpc:form.dialog.body": "Dialog Body",
+  "allaynpc:form.dialog.body.placeholder": "Enter dialog body text...",
+  "allaynpc:form.dialog.name.empty": "Dialog name cannot be empty!",
+  "allaynpc:form.dialog.exists": "Dialog '%1' already exists!",
+  "allaynpc:form.dialog.created": "Dialog '%1' created successfully!",
+  "allaynpc:form.dialog.save.failed": "Failed to save dialog!",
+  "allaynpc:form.dialog.notfound": "Dialog '%1' not found!",
+
+  "allaynpc:form.dialog.edit.title": "Edit Dialog: %1",
+  "allaynpc:form.dialog.edit.content": "Select what you want to edit:",
+  "allaynpc:form.dialog.edit.basic": "Title & Body",
+  "allaynpc:form.dialog.edit.buttons": "Buttons",
+  "allaynpc:form.dialog.delete": "Delete Dialog",
+  "allaynpc:form.dialog.back": "Back",
+
+  "allaynpc:form.dialog.basic.title": "Edit Dialog: %1",
+  "allaynpc:form.dialog.updated": "Dialog updated!",
+
+  "allaynpc:form.dialog.buttons.title": "Edit Buttons: %1",
+  "allaynpc:form.dialog.buttons.content": "Total buttons: %1",
+  "allaynpc:form.dialog.button.add": "+ Add Button",
+
+  "allaynpc:form.dialog.button.add.title": "Add Button",
+  "allaynpc:form.dialog.button.edit.title": "Edit Button #%1",
+  "allaynpc:form.dialog.button.text": "Button Text",
+  "allaynpc:form.dialog.button.text.placeholder": "Enter button text...",
+  "allaynpc:form.dialog.button.commands": "Commands (one per line)",
+  "allaynpc:form.dialog.button.commands.placeholder": "Enter commands...",
+  "allaynpc:form.dialog.button.message": "Message (sent to player)",
+  "allaynpc:form.dialog.button.message.placeholder": "Enter message...",
+  "allaynpc:form.dialog.button.asplayer": "Execute commands as player",
+  "allaynpc:form.dialog.button.added": "Button added!",
+  "allaynpc:form.dialog.button.content": "Text: %1\nCommands: %2\nMessage: %3\nAs Player: %4",
+  "allaynpc:form.dialog.button.edit": "Edit",
+  "allaynpc:form.dialog.button.delete": "Delete",
+  "allaynpc:form.dialog.button.deleted": "Button deleted!",
+  "allaynpc:form.dialog.button.updated": "Button updated!",
+
+  "allaynpc:form.dialog.delete.title": "Confirm Delete",
+  "allaynpc:form.dialog.delete.confirm": "Are you sure you want to delete dialog '%1'?\nThis action cannot be undone!",
+  "allaynpc:form.dialog.delete.yes": "Yes, Delete",
+  "allaynpc:form.dialog.delete.no": "Cancel",
+  "allaynpc:form.dialog.deleted": "Dialog '%1' deleted!",
+  "allaynpc:form.dialog.delete.failed": "Failed to delete dialog file!"
 }

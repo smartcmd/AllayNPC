@@ -57,6 +57,7 @@
   "allaynpc:command.help.remove": "/anpc remove <名称> - 移除 NPC 实体",
   "allaynpc:command.help.skins": "/anpc skins - 列出可用皮肤",
   "allaynpc:command.help.reload": "/anpc reload - 重载配置",
+  "allaynpc:command.help.dialog": "/anpc dialog - 管理对话",
 
   "allaynpc:form.create.title": "创建 NPC: %1",
   "allaynpc:form.create.displayname": "显示名称",
@@ -129,5 +130,59 @@
   "allaynpc:form.action.delete": "删除",
   "allaynpc:form.action.back": "返回",
 
-  "allaynpc:error.command.failed": "命令执行失败: %1"
+  "allaynpc:error.command.failed": "命令执行失败: %1",
+
+  "allaynpc:form.dialog.list.title": "对话管理",
+  "allaynpc:form.dialog.list.content": "对话总数: %1\n选择要编辑的对话或创建新对话:",
+  "allaynpc:form.dialog.create": "+ 创建对话",
+
+  "allaynpc:form.dialog.create.title": "创建对话",
+  "allaynpc:form.dialog.name": "对话名称",
+  "allaynpc:form.dialog.name.placeholder": "输入唯一名称（无空格）...",
+  "allaynpc:form.dialog.title.field": "对话标题",
+  "allaynpc:form.dialog.title.placeholder": "输入对话标题...",
+  "allaynpc:form.dialog.body": "对话内容",
+  "allaynpc:form.dialog.body.placeholder": "输入对话内容...",
+  "allaynpc:form.dialog.name.empty": "对话名称不能为空！",
+  "allaynpc:form.dialog.exists": "对话 '%1' 已存在！",
+  "allaynpc:form.dialog.created": "对话 '%1' 创建成功！",
+  "allaynpc:form.dialog.save.failed": "保存对话失败！",
+  "allaynpc:form.dialog.notfound": "未找到对话 '%1'！",
+
+  "allaynpc:form.dialog.edit.title": "编辑对话: %1",
+  "allaynpc:form.dialog.edit.content": "选择要编辑的内容:",
+  "allaynpc:form.dialog.edit.basic": "标题和内容",
+  "allaynpc:form.dialog.edit.buttons": "按钮",
+  "allaynpc:form.dialog.delete": "删除对话",
+  "allaynpc:form.dialog.back": "返回",
+
+  "allaynpc:form.dialog.basic.title": "编辑对话: %1",
+  "allaynpc:form.dialog.updated": "对话已更新！",
+
+  "allaynpc:form.dialog.buttons.title": "编辑按钮: %1",
+  "allaynpc:form.dialog.buttons.content": "按钮总数: %1",
+  "allaynpc:form.dialog.button.add": "+ 添加按钮",
+
+  "allaynpc:form.dialog.button.add.title": "添加按钮",
+  "allaynpc:form.dialog.button.edit.title": "编辑按钮 #%1",
+  "allaynpc:form.dialog.button.text": "按钮文本",
+  "allaynpc:form.dialog.button.text.placeholder": "输入按钮文本...",
+  "allaynpc:form.dialog.button.commands": "命令（每行一个）",
+  "allaynpc:form.dialog.button.commands.placeholder": "输入命令...",
+  "allaynpc:form.dialog.button.message": "消息（发送给玩家）",
+  "allaynpc:form.dialog.button.message.placeholder": "输入消息...",
+  "allaynpc:form.dialog.button.asplayer": "以玩家身份执行命令",
+  "allaynpc:form.dialog.button.added": "按钮已添加！",
+  "allaynpc:form.dialog.button.content": "文本: %1\n命令: %2\n消息: %3\n以玩家身份: %4",
+  "allaynpc:form.dialog.button.edit": "编辑",
+  "allaynpc:form.dialog.button.delete": "删除",
+  "allaynpc:form.dialog.button.deleted": "按钮已删除！",
+  "allaynpc:form.dialog.button.updated": "按钮已更新！",
+
+  "allaynpc:form.dialog.delete.title": "确认删除",
+  "allaynpc:form.dialog.delete.confirm": "确定要删除对话 '%1' 吗？\n此操作无法撤销！",
+  "allaynpc:form.dialog.delete.yes": "是，删除",
+  "allaynpc:form.dialog.delete.no": "取消",
+  "allaynpc:form.dialog.deleted": "对话 '%1' 已删除！",
+  "allaynpc:form.dialog.delete.failed": "删除对话文件失败！"
 }

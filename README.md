@@ -18,7 +18,7 @@
 - 👀 **Look at Player** - NPCs automatically look at each player individually (per-player view)
 - 🎬 **Emote Support** - NPCs can play emotes at configurable intervals
 - ⚔️ **Equipment System** - Full armor and held item support
-- 💬 **Dialog System** - Create interactive dialogs with buttons
+- 💬 **Dialog System** - Create interactive dialogs with buttons (in-game editor included!)
 - 🎯 **Click Actions** - Execute commands, send messages, or open dialogs on click
 - 🌍 **Multi-language** - Built-in i18n support (English & Chinese)
 - 📝 **In-game Editor** - Create and edit NPCs with intuitive forms
@@ -44,6 +44,7 @@
 | `/anpc spawn <name>` | Spawn an NPC |
 | `/anpc remove <name>` | Remove NPC entity (keeps config) |
 | `/anpc skins` | List available skins |
+| `/anpc dialog` | Manage dialogs (in-game UI) |
 | `/anpc reload` | Reload configuration |
 | `/anpc help` | Show help |
 
@@ -185,7 +186,19 @@ actions:
 
 ## 💬 Dialog Configuration
 
-Example dialog configuration (`dialogs/shop_menu.yml`):
+### In-Game Dialog Editor
+
+You can create and manage dialogs directly in-game using the form UI:
+
+1. Run `/anpc dialog` to open the dialog management interface
+2. Create new dialogs with title, body text, and buttons
+3. Edit existing dialogs - modify title, body, and button configurations
+4. Add buttons with commands, messages, and player execution settings
+5. Delete dialogs when no longer needed
+
+### Manual Configuration
+
+You can also create dialog configuration files manually (`dialogs/shop_menu.yml`):
 
 ```yaml
 # Dialog title (supports color codes and placeholders)

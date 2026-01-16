@@ -158,4 +158,68 @@ public class I18nKeys {
 
     // Error messages
     public static final String ERROR_COMMAND_FAILED = "allaynpc:error.command.failed";
+
+    // Form - Dialog list
+    public static final String FORM_DIALOG_LIST_TITLE = "allaynpc:form.dialog.list.title";
+    public static final String FORM_DIALOG_LIST_CONTENT = "allaynpc:form.dialog.list.content";
+    public static final String FORM_DIALOG_CREATE = "allaynpc:form.dialog.create";
+
+    // Form - Dialog create
+    public static final String FORM_DIALOG_CREATE_TITLE = "allaynpc:form.dialog.create.title";
+    public static final String FORM_DIALOG_NAME = "allaynpc:form.dialog.name";
+    public static final String FORM_DIALOG_NAME_PLACEHOLDER = "allaynpc:form.dialog.name.placeholder";
+    public static final String FORM_DIALOG_TITLE_FIELD = "allaynpc:form.dialog.title.field";
+    public static final String FORM_DIALOG_TITLE_PLACEHOLDER = "allaynpc:form.dialog.title.placeholder";
+    public static final String FORM_DIALOG_BODY = "allaynpc:form.dialog.body";
+    public static final String FORM_DIALOG_BODY_PLACEHOLDER = "allaynpc:form.dialog.body.placeholder";
+    public static final String FORM_DIALOG_NAME_EMPTY = "allaynpc:form.dialog.name.empty";
+    public static final String FORM_DIALOG_EXISTS = "allaynpc:form.dialog.exists";
+    public static final String FORM_DIALOG_CREATED = "allaynpc:form.dialog.created";
+    public static final String FORM_DIALOG_SAVE_FAILED = "allaynpc:form.dialog.save.failed";
+    public static final String FORM_DIALOG_NOTFOUND = "allaynpc:form.dialog.notfound";
+
+    // Form - Dialog edit menu
+    public static final String FORM_DIALOG_EDIT_TITLE = "allaynpc:form.dialog.edit.title";
+    public static final String FORM_DIALOG_EDIT_CONTENT = "allaynpc:form.dialog.edit.content";
+    public static final String FORM_DIALOG_EDIT_BASIC = "allaynpc:form.dialog.edit.basic";
+    public static final String FORM_DIALOG_EDIT_BUTTONS = "allaynpc:form.dialog.edit.buttons";
+    public static final String FORM_DIALOG_DELETE = "allaynpc:form.dialog.delete";
+    public static final String FORM_DIALOG_BACK = "allaynpc:form.dialog.back";
+
+    // Form - Dialog basic edit
+    public static final String FORM_DIALOG_BASIC_TITLE = "allaynpc:form.dialog.basic.title";
+    public static final String FORM_DIALOG_UPDATED = "allaynpc:form.dialog.updated";
+
+    // Form - Dialog buttons menu
+    public static final String FORM_DIALOG_BUTTONS_TITLE = "allaynpc:form.dialog.buttons.title";
+    public static final String FORM_DIALOG_BUTTONS_CONTENT = "allaynpc:form.dialog.buttons.content";
+    public static final String FORM_DIALOG_BUTTON_ADD = "allaynpc:form.dialog.button.add";
+
+    // Form - Dialog button add/edit
+    public static final String FORM_DIALOG_BUTTON_ADD_TITLE = "allaynpc:form.dialog.button.add.title";
+    public static final String FORM_DIALOG_BUTTON_EDIT_TITLE = "allaynpc:form.dialog.button.edit.title";
+    public static final String FORM_DIALOG_BUTTON_TEXT = "allaynpc:form.dialog.button.text";
+    public static final String FORM_DIALOG_BUTTON_TEXT_PLACEHOLDER = "allaynpc:form.dialog.button.text.placeholder";
+    public static final String FORM_DIALOG_BUTTON_COMMANDS = "allaynpc:form.dialog.button.commands";
+    public static final String FORM_DIALOG_BUTTON_COMMANDS_PLACEHOLDER = "allaynpc:form.dialog.button.commands.placeholder";
+    public static final String FORM_DIALOG_BUTTON_MESSAGE = "allaynpc:form.dialog.button.message";
+    public static final String FORM_DIALOG_BUTTON_MESSAGE_PLACEHOLDER = "allaynpc:form.dialog.button.message.placeholder";
+    public static final String FORM_DIALOG_BUTTON_ASPLAYER = "allaynpc:form.dialog.button.asplayer";
+    public static final String FORM_DIALOG_BUTTON_ADDED = "allaynpc:form.dialog.button.added";
+    public static final String FORM_DIALOG_BUTTON_CONTENT = "allaynpc:form.dialog.button.content";
+    public static final String FORM_DIALOG_BUTTON_EDIT = "allaynpc:form.dialog.button.edit";
+    public static final String FORM_DIALOG_BUTTON_DELETE = "allaynpc:form.dialog.button.delete";
+    public static final String FORM_DIALOG_BUTTON_DELETED = "allaynpc:form.dialog.button.deleted";
+    public static final String FORM_DIALOG_BUTTON_UPDATED = "allaynpc:form.dialog.button.updated";
+
+    // Form - Dialog delete confirmation
+    public static final String FORM_DIALOG_DELETE_TITLE = "allaynpc:form.dialog.delete.title";
+    public static final String FORM_DIALOG_DELETE_CONFIRM = "allaynpc:form.dialog.delete.confirm";
+    public static final String FORM_DIALOG_DELETE_YES = "allaynpc:form.dialog.delete.yes";
+    public static final String FORM_DIALOG_DELETE_NO = "allaynpc:form.dialog.delete.no";
+    public static final String FORM_DIALOG_DELETED = "allaynpc:form.dialog.deleted";
+    public static final String FORM_DIALOG_DELETE_FAILED = "allaynpc:form.dialog.delete.failed";
+
+    // Command - Dialog
+    public static final String COMMAND_HELP_DIALOG = "allaynpc:command.help.dialog";
 }

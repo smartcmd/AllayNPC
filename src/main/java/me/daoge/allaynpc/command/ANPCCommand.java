@@ -2,6 +2,7 @@ package me.daoge.allaynpc.command;
 
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.NPCConfig;
+import me.daoge.allaynpc.form.DialogFormHandler;
 import me.daoge.allaynpc.form.NPCFormHandler;
 import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.manager.NPCManager;
@@ -100,6 +101,11 @@ public class ANPCCommand extends Command {
                         String name = ctx.getResult(1);
                         return handleRemove(ctx, name);
                     })
+                .root()
+
+                // /anpc dialog - Open dialog management form
+                .key("dialog")
+                    .exec((ctx, player) -> handleDialog(ctx, player), SenderType.PLAYER)
                 .root()
 
                 // /anpc help - Show help
@@ -310,6 +316,14 @@ public class ANPCCommand extends Command {
     }
 
     /**
+     * Handle dialog command - Open dialog management form
+     */
+    private CommandResult handleDialog(CommandContext ctx, EntityPlayer player) {
+        DialogFormHandler.openDialogListForm(player);
+        return ctx.success();
+    }
+
+    /**
      * Handle help command
      */
     private CommandResult handleHelp(CommandContext ctx) {
@@ -324,6 +338,7 @@ public class ANPCCommand extends Command {
         sb.append(TextFormat.YELLOW).append(I18nUtil.tr(sender, I18nKeys.COMMAND_HELP_SPAWN)).append("\n");
         sb.append(TextFormat.YELLOW).append(I18nUtil.tr(sender, I18nKeys.COMMAND_HELP_REMOVE)).append("\n");
         sb.append(TextFormat.YELLOW).append(I18nUtil.tr(sender, I18nKeys.COMMAND_HELP_SKINS)).append("\n");
+        sb.append(TextFormat.YELLOW).append(I18nUtil.tr(sender, I18nKeys.COMMAND_HELP_DIALOG)).append("\n");
         sb.append(TextFormat.YELLOW).append(I18nUtil.tr(sender, I18nKeys.COMMAND_HELP_RELOAD)).append("\n");
 
         sender.sendMessage(sb.toString());
