@@ -3,10 +3,12 @@ package me.daoge.allaynpc.action;
 import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.DialogConfig;
+import me.daoge.allaynpc.i18n.I18nKeys;
 import me.daoge.allaynpc.npc.NPC;
 import me.daoge.allaynpc.util.PlaceholderUtil;
 import org.allaymc.api.dialog.Dialog;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
+import org.allaymc.api.message.I18n;
 import org.allaymc.api.player.Player;
 import org.allaymc.api.registry.Registries;
 import org.allaymc.api.server.Server;
@@ -80,6 +82,8 @@ public class DialogAction implements NPCAction {
                         }
                     } catch (Exception e) {
                         log.error("Failed to execute button command: {}", parsedCommand, e);
+                        // Notify player about command failure
+                        player.sendMessage(TextFormat.RED + I18n.get().tr(I18nKeys.ERROR_COMMAND_FAILED, parsedCommand));
                     }
                 }
 
@@ -91,7 +95,12 @@ public class DialogAction implements NPCAction {
             });
         }
 
-        // Show dialog
-        dialog.sendTo(actualPlayer, npc.getEntity());
+        // Show dialog (verify NPC entity is still valid)
+        EntityPlayer npcEntity = npc.getEntity();
+        if (npcEntity == null) {
+            log.warn("NPC entity is null, cannot show dialog");
+            return;
+        }
+        dialog.sendTo(actualPlayer, npcEntity);
     }
 }

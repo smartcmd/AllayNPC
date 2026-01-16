@@ -125,5 +125,8 @@
   "allaynpc:form.action.content": "Type: %1\nValue: %2\nAs Player: %3",
   "allaynpc:form.action.edit": "Edit",
   "allaynpc:form.action.delete": "Delete",
-  "allaynpc:form.action.back": "Back"
+  "allaynpc:form.action.back": "Back",
+
+  "allaynpc:error.command.failed": "Command execution failed: %1",
+  "allaynpc:error.invalid.emote.uuid": "Invalid emote UUID for NPC '%1': %2"
 }

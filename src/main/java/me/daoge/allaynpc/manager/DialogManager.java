@@ -11,10 +11,16 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Dialog Manager
  * Responsible for loading, caching and managing dialog configs
+ * <p>
+ * Thread-safety: This class uses atomic replacement for reload operations.
+ * During reload, a new map is populated and then atomically swapped with the old one.
+ * This ensures other threads always see either the complete old state or complete new state,
+ * never an intermediate state.
  *
  * @author daoge_cmd
  */
@@ -28,13 +34,10 @@ public class DialogManager {
 
     /**
      * Dialog cache (dialog name -> dialog config)
+     * Marked volatile to ensure visibility of atomic replacement across threads.
+     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
-    private final Map<String, DialogConfig> dialogs = new HashMap<>();
-
-    /**
-     * YAML parser
-     */
-    private final Yaml yaml = new Yaml();
+    private volatile Map<String, DialogConfig> dialogs = new ConcurrentHashMap<>();
 
     /**
      * Create dialog manager
@@ -46,36 +49,48 @@ public class DialogManager {
     }
 
     /**
-     * Load all dialog configs
+     * Load all dialog configs using atomic replacement pattern.
+     * Creates a new map, populates it, then atomically replaces the old map.
+     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllDialogs() {
-        dialogs.clear();
+        // Create new map for atomic replacement
+        Map<String, DialogConfig> newDialogs = new ConcurrentHashMap<>();
 
         if (!Files.exists(dialogsDirectory)) {
             log.warn("Dialogs directory does not exist: {}", dialogsDirectory);
+            // Atomically replace with empty map
+            this.dialogs = newDialogs;
             return;
         }
+
+        // Create new Yaml instance for thread safety (Yaml is not thread-safe)
+        Yaml yaml = new Yaml();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dialogsDirectory, "*.yml")) {
             for (Path path : stream) {
                 String fileName = path.getFileName().toString();
                 String dialogName = fileName.replace(".yml", "");
-                loadDialog(path, dialogName);
+                loadDialog(path, dialogName, yaml, newDialogs);
             }
         } catch (IOException e) {
             log.error("Failed to load dialogs from directory: {}", dialogsDirectory, e);
         }
 
-        log.info("Loaded {} dialogs", dialogs.size());
+        // Atomic replacement - other threads will see either old or new map, never empty
+        this.dialogs = newDialogs;
+        log.info("Loaded {} dialogs", newDialogs.size());
     }
 
     /**
-     * Load a single dialog config from file
+     * Load a single dialog config from file into target map
      *
      * @param path       config file path
      * @param dialogName dialog name
+     * @param yaml       YAML parser instance
+     * @param targetMap  target map to put dialog into
      */
-    private void loadDialog(Path path, String dialogName) {
+    private void loadDialog(Path path, String dialogName, Yaml yaml, Map<String, DialogConfig> targetMap) {
         try (InputStream inputStream = Files.newInputStream(path)) {
             Map<String, Object> data = yaml.load(inputStream);
             if (data == null) {
@@ -84,7 +99,7 @@ public class DialogManager {
             }
 
             DialogConfig config = parseDialogConfig(dialogName, data);
-            dialogs.put(dialogName, config);
+            targetMap.put(dialogName, config);
             log.debug("Loaded dialog: {}", dialogName);
 
         } catch (IOException e) {
@@ -137,7 +152,7 @@ public class DialogManager {
                 .message(getString(data, "message", ""))
                 .asPlayer(getBoolean(data, "as_player", false));
 
-        // Parse command list
+        // Parse command list (supports both List and single String)
         List<String> commands = new ArrayList<>();
         Object commandsObj = data.get("commands");
         if (commandsObj instanceof List<?> commandsList) {
@@ -147,7 +162,10 @@ public class DialogManager {
                 }
             }
         } else if (commandsObj instanceof String cmdStr) {
+            // Support single command as string
             commands.add(cmdStr);
+        } else if (commandsObj != null) {
+            log.warn("Invalid commands format, expected List or String but got: {}", commandsObj.getClass().getSimpleName());
         }
         builder.commands(commands);
 

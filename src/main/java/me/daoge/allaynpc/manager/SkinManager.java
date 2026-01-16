@@ -10,13 +10,18 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Skin Manager
  * Responsible for loading, caching and managing NPC skins
+ * <p>
+ * Thread-safety: This class uses atomic replacement for reload operations.
+ * During reload, a new map is populated and then atomically swapped with the old one.
+ * This ensures other threads always see either the complete old state or complete new state,
+ * never an intermediate state.
  *
  * @author daoge_cmd
  */
@@ -30,13 +35,16 @@ public class SkinManager {
 
     /**
      * Skin cache (skin name -> skin object)
+     * Marked volatile to ensure visibility of atomic replacement across threads.
+     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
-    private final Map<String, Skin> skins = new HashMap<>();
+    private volatile Map<String, Skin> skins = new ConcurrentHashMap<>();
 
     /**
      * Default skin
+     * Marked volatile for visibility across threads
      */
-    private Skin defaultSkin;
+    private volatile Skin defaultSkin;
 
     /**
      * Create skin manager
@@ -49,13 +57,18 @@ public class SkinManager {
     }
 
     /**
-     * Load all skins
+     * Load all skins using atomic replacement pattern.
+     * Creates a new map, populates it, then atomically replaces the old map.
+     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllSkins() {
-        skins.clear();
+        // Create new map for atomic replacement
+        Map<String, Skin> newSkins = new ConcurrentHashMap<>();
 
         if (!Files.exists(skinsDirectory)) {
             log.warn("Skins directory does not exist: {}", skinsDirectory);
+            // Atomically replace with empty map
+            this.skins = newSkins;
             return;
         }
 
@@ -65,30 +78,33 @@ public class SkinManager {
 
                 if (Files.isDirectory(path)) {
                     // Load skin from folder
-                    loadSkinFromFolder(path, fileName);
+                    loadSkinFromFolder(path, fileName, newSkins);
                 } else if (fileName.endsWith(".png")) {
                     // Load skin from single PNG file
                     String skinName = fileName.replace(".png", "").replace("_slim", "");
-                    loadSkinFromFile(path, skinName);
+                    loadSkinFromFile(path, skinName, newSkins);
                 }
             }
         } catch (IOException e) {
             log.error("Failed to load skins from directory: {}", skinsDirectory, e);
         }
 
-        log.info("Loaded {} skins", skins.size());
+        // Atomic replacement - other threads will see either old or new map, never empty
+        this.skins = newSkins;
+        log.info("Loaded {} skins", newSkins.size());
     }
 
     /**
-     * Load skin from folder
+     * Load skin from folder into target map
      *
-     * @param folder   skin folder
-     * @param skinName skin name
+     * @param folder     skin folder
+     * @param skinName   skin name
+     * @param targetMap  target map to put skin into
      */
-    private void loadSkinFromFolder(Path folder, String skinName) {
+    private void loadSkinFromFolder(Path folder, String skinName, Map<String, Skin> targetMap) {
         Skin skin = SkinUtil.loadSkinFromFolder(folder, skinName);
         if (skin != null) {
-            skins.put(skinName, skin);
+            targetMap.put(skinName, skin);
             log.debug("Loaded skin from folder: {}", skinName);
         } else {
             log.warn("Failed to load skin from folder: {}", skinName);
@@ -96,15 +112,16 @@ public class SkinManager {
     }
 
     /**
-     * Load skin from file
+     * Load skin from file into target map
      *
-     * @param file     skin file
-     * @param skinName skin name
+     * @param file       skin file
+     * @param skinName   skin name
+     * @param targetMap  target map to put skin into
      */
-    private void loadSkinFromFile(Path file, String skinName) {
+    private void loadSkinFromFile(Path file, String skinName, Map<String, Skin> targetMap) {
         Skin skin = SkinUtil.loadSkinFromFile(file, skinName);
         if (skin != null) {
-            skins.put(skinName, skin);
+            targetMap.put(skinName, skin);
             log.debug("Loaded skin from file: {}", skinName);
         } else {
             log.warn("Failed to load skin from file: {}", skinName);

@@ -476,10 +476,11 @@ public class NPCFormHandler {
     }
 
     /**
-     * Truncate string
+     * Truncate string with ellipsis
      */
     private static String truncate(String str, int maxLength) {
         if (str == null) return "";
+        if (maxLength <= 3) return str.length() <= maxLength ? str : str.substring(0, maxLength);
         if (str.length() <= maxLength) return str;
         return str.substring(0, maxLength - 3) + "...";
     }

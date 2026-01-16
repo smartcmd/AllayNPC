@@ -11,6 +11,7 @@ import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.entity.type.EntityTypes;
 import org.allaymc.api.player.Player;
 import org.allaymc.api.item.ItemStack;
+import org.allaymc.api.math.MathUtils;
 import org.allaymc.api.math.location.Location3d;
 import org.allaymc.api.math.location.Location3dc;
 import org.allaymc.api.player.GameMode;
@@ -22,9 +23,12 @@ import org.allaymc.api.utils.identifier.Identifier;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.api.world.World;
 import org.allaymc.api.world.chunk.FakeChunkLoader;
+import org.allaymc.api.world.WorldViewer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -149,7 +153,30 @@ public class NPC {
 
         } catch (Exception e) {
             log.error("Failed to spawn NPC {}", config.getName(), e);
+            // Rollback: clean up any partially initialized resources
+            cleanupFailedSpawn(dimension);
             return false;
+        }
+    }
+
+    /**
+     * Clean up resources after a failed spawn attempt
+     *
+     * @param dimension the dimension where spawn was attempted
+     */
+    private void cleanupFailedSpawn(Dimension dimension) {
+        try {
+            if (chunkLoader != null && dimension != null) {
+                dimension.getChunkManager().removeChunkLoader(chunkLoader);
+                chunkLoader = null;
+            }
+            if (entity != null && dimension != null) {
+                dimension.getEntityManager().removeEntity(entity);
+            }
+        } catch (Exception cleanupError) {
+            log.warn("Error during spawn cleanup for NPC {}: {}", config.getName(), cleanupError.getMessage());
+        } finally {
+            entity = null;
         }
     }
 
@@ -424,7 +451,10 @@ public class NPC {
 
         Location3dc npcLoc = entity.getLocation();
 
-        for (var viewer : entity.getViewers()) {
+        // Copy viewers to avoid ConcurrentModificationException during iteration
+        List<WorldViewer> viewers = new ArrayList<>(entity.getViewers());
+
+        for (var viewer : viewers) {
             // viewer is WorldViewer (Player), not EntityPlayer
             // Need to get the controlled EntityPlayer from Player
             if (!(viewer instanceof Player player)) continue;
@@ -435,23 +465,16 @@ public class NPC {
             try {
                 Location3dc playerLoc = playerEntity.getLocation();
 
-                // Calculate direction vector (target at player's eye level)
-                double dx = playerLoc.x() - npcLoc.x();
-                double dy = (playerLoc.y() + 1.62) - (npcLoc.y() + 1.62); // Eye level
-                double dz = playerLoc.z() - npcLoc.z();
+                // Calculate direction vector from NPC to player (at eye level)
+                Vector3d direction = new Vector3d(
+                        playerLoc.x() - npcLoc.x(),
+                        (playerLoc.y() + 1.62) - (npcLoc.y() + 1.62),
+                        playerLoc.z() - npcLoc.z()
+                );
 
-                // Calculate horizontal distance
-                double horizontalDist = Math.sqrt(dx * dx + dz * dz);
-
-                // Calculate yaw (horizontal rotation)
-                // In Minecraft, yaw 0 is south (+Z), and increases counterclockwise
-                double yaw = Math.toDegrees(Math.atan2(-dx, dz));
-
-                // Calculate pitch (vertical rotation)
-                double pitch = -Math.toDegrees(Math.atan2(dy, horizontalDist));
-
-                // Clamp pitch to prevent extreme angles
-                pitch = Math.max(-89, Math.min(89, pitch));
+                // Use MathUtils for yaw/pitch calculation
+                double yaw = MathUtils.getYawFromVector(direction);
+                double pitch = MathUtils.getPitchFromVector(direction);
 
                 // Create location with updated rotation for this specific viewer
                 Location3d viewLocation = new Location3d(
@@ -461,7 +484,6 @@ public class NPC {
                 );
 
                 // Send individualized location to this viewer only
-                // The lastSentLocation is passed as a new object to avoid modifying the actual entity state
                 player.viewEntityLocation(entity, new Location3d(npcLoc), viewLocation, false);
 
             } catch (Exception e) {

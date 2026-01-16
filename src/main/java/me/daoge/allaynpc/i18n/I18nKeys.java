@@ -153,4 +153,8 @@ public class I18nKeys {
     public static final String FORM_ACTION_EDIT = "allaynpc:form.action.edit";
     public static final String FORM_ACTION_DELETE = "allaynpc:form.action.delete";
     public static final String FORM_ACTION_BACK = "allaynpc:form.action.back";
+
+    // Error messages
+    public static final String ERROR_COMMAND_FAILED = "allaynpc:error.command.failed";
+    public static final String ERROR_INVALID_EMOTE_UUID = "allaynpc:error.invalid.emote.uuid";
 }

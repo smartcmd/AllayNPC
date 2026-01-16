@@ -12,13 +12,18 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cape Manager
  * Responsible for loading, caching and managing NPC capes
+ * <p>
+ * Thread-safety: This class uses atomic replacement for reload operations.
+ * During reload, a new map is populated and then atomically swapped with the old one.
+ * This ensures other threads always see either the complete old state or complete new state,
+ * never an intermediate state.
  *
  * @author daoge_cmd
  */
@@ -32,8 +37,10 @@ public class CapeManager {
 
     /**
      * Cape cache (cape name -> cape ImageData)
+     * Marked volatile to ensure visibility of atomic replacement across threads.
+     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
-    private final Map<String, Skin.ImageData> capes = new HashMap<>();
+    private volatile Map<String, Skin.ImageData> capes = new ConcurrentHashMap<>();
 
     /**
      * Create cape manager
@@ -45,13 +52,18 @@ public class CapeManager {
     }
 
     /**
-     * Load all capes
+     * Load all capes using atomic replacement pattern.
+     * Creates a new map, populates it, then atomically replaces the old map.
+     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllCapes() {
-        capes.clear();
+        // Create new map for atomic replacement
+        Map<String, Skin.ImageData> newCapes = new ConcurrentHashMap<>();
 
         if (!Files.exists(capesDirectory)) {
             log.warn("Capes directory does not exist: {}", capesDirectory);
+            // Atomically replace with empty map
+            this.capes = newCapes;
             return;
         }
 
@@ -59,22 +71,25 @@ public class CapeManager {
             for (Path path : stream) {
                 String fileName = path.getFileName().toString();
                 String capeName = fileName.replace(".png", "");
-                loadCape(path, capeName);
+                loadCape(path, capeName, newCapes);
             }
         } catch (IOException e) {
             log.error("Failed to load capes from directory: {}", capesDirectory, e);
         }
 
-        log.info("Loaded {} capes", capes.size());
+        // Atomic replacement - other threads will see either old or new map, never empty
+        this.capes = newCapes;
+        log.info("Loaded {} capes", newCapes.size());
     }
 
     /**
-     * Load a single cape from file
+     * Load a single cape from file into target map
      *
-     * @param file     cape file path
-     * @param capeName cape name
+     * @param file      cape file path
+     * @param capeName  cape name
+     * @param targetMap target map to put cape into
      */
-    private void loadCape(Path file, String capeName) {
+    private void loadCape(Path file, String capeName, Map<String, Skin.ImageData> targetMap) {
         try {
             BufferedImage image = ImageIO.read(file.toFile());
             if (image == null) {
@@ -95,7 +110,7 @@ public class CapeManager {
             // Create ImageData
             Skin.ImageData imageData = new Skin.ImageData(image.getWidth(), image.getHeight(), capeData);
 
-            capes.put(capeName, imageData);
+            targetMap.put(capeName, imageData);
             log.debug("Loaded cape: {} ({}x{})", capeName, image.getWidth(), image.getHeight());
 
         } catch (IOException e) {

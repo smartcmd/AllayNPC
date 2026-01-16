@@ -21,7 +21,10 @@ public class PlaceholderUtil {
      * @return parsed text
      */
     public static String parse(EntityPlayer player, String text) {
-        if (text == null || text.isEmpty()) {
+        if (text == null) {
+            return "";
+        }
+        if (text.isEmpty()) {
             return text;
         }
         return PlaceholderAPI.getAPI().setPlaceholders(player, text);

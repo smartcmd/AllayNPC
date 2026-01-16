@@ -46,6 +46,11 @@ public class NPCManager {
     private final Map<String, NPC> spawnedNPCs = new ConcurrentHashMap<>();
 
     /**
+     * Entity to NPC mapping for O(1) lookup (entity runtimeId -> NPC instance)
+     */
+    private final Map<Long, NPC> entityToNPC = new ConcurrentHashMap<>();
+
+    /**
      * Player click cooldown records (playerUUID_npcName -> last click time)
      */
     private final Map<String, Long> clickCooldowns = new ConcurrentHashMap<>();
@@ -136,9 +141,9 @@ public class NPCManager {
                 .cape(getString(data, "cape", ""))
                 .heldItem(getString(data, "held_item", ""))
                 .lookAtPlayer(getBoolean(data, "look_at_player", true))
-                .scale(getDouble(data, "scale", 1.0))
+                .scale(clampScale(getDouble(data, "scale", 1.0)))
                 .scoreTag(getString(data, "score_tag", ""))
-                .clickCooldown(getInt(data, "click_cooldown", 20));
+                .clickCooldown(clampClickCooldown(getInt(data, "click_cooldown", 20)));
 
         // Parse position
         Object positionObj = data.get("position");
@@ -203,11 +208,23 @@ public class NPCManager {
     }
 
     /**
-     * Parse emote config
+     * Parse emote config with UUID validation
      */
     private NPCConfig.EmoteConfig parseEmoteConfig(Map<String, Object> data) {
+        String emoteId = getString(data, "id", "");
+
+        // Validate UUID format if not empty
+        if (!emoteId.isEmpty()) {
+            try {
+                java.util.UUID.fromString(emoteId);
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid emote UUID format: {}, emote will be disabled", emoteId);
+                emoteId = ""; // Clear invalid UUID
+            }
+        }
+
         return NPCConfig.EmoteConfig.builder()
-                .id(getString(data, "id", ""))
+                .id(emoteId)
                 .interval(getInt(data, "interval", 100))
                 .build();
     }
@@ -369,6 +386,42 @@ public class NPCManager {
     }
 
     /**
+     * Clamp click cooldown to valid range (0-10000 ticks)
+     *
+     * @param value raw value
+     * @return clamped value
+     */
+    private int clampClickCooldown(int value) {
+        if (value < 0) {
+            log.warn("Click cooldown {} is negative, setting to 0", value);
+            return 0;
+        }
+        if (value > 10000) {
+            log.warn("Click cooldown {} exceeds maximum (10000), setting to 10000", value);
+            return 10000;
+        }
+        return value;
+    }
+
+    /**
+     * Clamp scale to valid range (0.1-10.0)
+     *
+     * @param value raw value
+     * @return clamped value
+     */
+    private double clampScale(double value) {
+        if (value < 0.1) {
+            log.warn("Scale {} is too small, setting to 0.1", value);
+            return 0.1;
+        }
+        if (value > 10.0) {
+            log.warn("Scale {} exceeds maximum (10.0), setting to 10.0", value);
+            return 10.0;
+        }
+        return value;
+    }
+
+    /**
      * Spawn all NPCs
      */
     public void spawnAllNPCs() {
@@ -398,6 +451,10 @@ public class NPCManager {
         NPC npc = new NPC(config);
         if (npc.spawn()) {
             spawnedNPCs.put(npcName, npc);
+            // Add to entity mapping for O(1) lookup
+            if (npc.getEntity() != null) {
+                entityToNPC.put(npc.getEntity().getRuntimeId(), npc);
+            }
             return true;
         }
 
@@ -412,8 +469,24 @@ public class NPCManager {
     public void removeNPC(String npcName) {
         NPC npc = spawnedNPCs.remove(npcName);
         if (npc != null) {
+            // Remove from entity mapping
+            if (npc.getEntity() != null) {
+                entityToNPC.remove(npc.getEntity().getRuntimeId());
+            }
             npc.remove();
+            // Clean up cooldown records for this NPC
+            cleanupCooldownsForNPC(npcName);
         }
+    }
+
+    /**
+     * Clean up cooldown records for a specific NPC
+     *
+     * @param npcName NPC name
+     */
+    private void cleanupCooldownsForNPC(String npcName) {
+        String suffix = "_" + npcName;
+        clickCooldowns.entrySet().removeIf(entry -> entry.getKey().endsWith(suffix));
     }
 
     /**
@@ -424,6 +497,7 @@ public class NPCManager {
             npc.remove();
         }
         spawnedNPCs.clear();
+        entityToNPC.clear();
     }
 
     /**
@@ -438,19 +512,15 @@ public class NPCManager {
     }
 
     /**
-     * Get NPC instance by entity
+     * Get NPC instance by entity (O(1) lookup)
      *
      * @param entity entity
      * @return NPC instance, null if not exists
      */
     @Nullable
     public NPC getNPCByEntity(Entity entity) {
-        for (NPC npc : spawnedNPCs.values()) {
-            if (npc.getEntity() == entity) {
-                return npc;
-            }
-        }
-        return null;
+        if (entity == null) return null;
+        return entityToNPC.get(entity.getRuntimeId());
     }
 
     /**

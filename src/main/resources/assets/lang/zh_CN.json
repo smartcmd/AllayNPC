@@ -125,5 +125,8 @@
   "allaynpc:form.action.content": "类型: %1\n值: %2\n以玩家身份: %3",
   "allaynpc:form.action.edit": "编辑",
   "allaynpc:form.action.delete": "删除",
-  "allaynpc:form.action.back": "返回"
+  "allaynpc:form.action.back": "返回",
+
+  "allaynpc:error.command.failed": "命令执行失败: %1",
+  "allaynpc:error.invalid.emote.uuid": "NPC '%1' 的表情 UUID 无效: %2"
 }
