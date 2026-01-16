@@ -29,8 +29,6 @@ public class DialogManager {
 
     /**
      * Dialog cache (dialog name -> dialog config)
-     * Marked volatile to ensure visibility of atomic replacement across threads.
-     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
     private volatile Map<String, DialogConfig> dialogs = new ConcurrentHashMap<>();
 
@@ -45,8 +43,6 @@ public class DialogManager {
 
     /**
      * Load all dialog configs using atomic replacement pattern.
-     * Creates a new map, populates it, then atomically replaces the old map.
-     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllDialogs() {
         // Create new map for atomic replacement

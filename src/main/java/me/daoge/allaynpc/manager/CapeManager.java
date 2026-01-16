@@ -32,8 +32,6 @@ public class CapeManager {
 
     /**
      * Cape cache (cape name -> cape ImageData)
-     * Marked volatile to ensure visibility of atomic replacement across threads.
-     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
     private volatile Map<String, Skin.ImageData> capes = new ConcurrentHashMap<>();
 
@@ -48,8 +46,6 @@ public class CapeManager {
 
     /**
      * Load all capes using atomic replacement pattern.
-     * Creates a new map, populates it, then atomically replaces the old map.
-     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllCapes() {
         // Create new map for atomic replacement

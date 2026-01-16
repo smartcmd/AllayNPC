@@ -25,8 +25,6 @@
   "allaynpc:command.registered": "已注册 /anpc 命令",
   "allaynpc:command.description": "AllayNPC 管理命令",
   "allaynpc:event.registered": "已注册事件监听器",
-  "allaynpc:task.started": "已启动 NPC 更新任务（间隔: %1 tick）",
-  "allaynpc:npc.update.error": "更新 NPC %1 时出错: %2",
 
   "allaynpc:command.npc.exists": "NPC '%1' 已存在！",
   "allaynpc:command.npc.notfound": "未找到 NPC '%1'！",
@@ -127,6 +125,5 @@
   "allaynpc:form.action.delete": "删除",
   "allaynpc:form.action.back": "返回",
 
-  "allaynpc:error.command.failed": "命令执行失败: %1",
-  "allaynpc:error.invalid.emote.uuid": "NPC '%1' 的表情 UUID 无效: %2"
+  "allaynpc:error.command.failed": "命令执行失败: %1"
 }

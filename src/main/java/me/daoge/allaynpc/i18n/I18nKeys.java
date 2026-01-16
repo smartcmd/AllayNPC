@@ -40,8 +40,6 @@ public class I18nKeys {
     public static final String COMMAND_REGISTERED = "allaynpc:command.registered";
     public static final String COMMAND_DESCRIPTION = "allaynpc:command.description";
     public static final String EVENT_REGISTERED = "allaynpc:event.registered";
-    public static final String TASK_STARTED = "allaynpc:task.started";
-    public static final String NPC_UPDATE_ERROR = "allaynpc:npc.update.error";
 
     // Command messages
     public static final String COMMAND_NPC_EXISTS = "allaynpc:command.npc.exists";
@@ -156,5 +154,4 @@ public class I18nKeys {
 
     // Error messages
     public static final String ERROR_COMMAND_FAILED = "allaynpc:error.command.failed";
-    public static final String ERROR_INVALID_EMOTE_UUID = "allaynpc:error.invalid.emote.uuid";
 }

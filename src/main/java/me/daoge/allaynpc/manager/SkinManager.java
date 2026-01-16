@@ -30,14 +30,11 @@ public class SkinManager {
 
     /**
      * Skin cache (skin name -> skin object)
-     * Marked volatile to ensure visibility of atomic replacement across threads.
-     * Uses ConcurrentHashMap for thread-safe individual operations.
      */
     private volatile Map<String, Skin> skins = new ConcurrentHashMap<>();
 
     /**
      * Default skin
-     * Marked volatile for visibility across threads
      */
     private volatile Skin defaultSkin;
 
@@ -53,8 +50,6 @@ public class SkinManager {
 
     /**
      * Load all skins using atomic replacement pattern.
-     * Creates a new map, populates it, then atomically replaces the old map.
-     * This ensures other threads never see an empty or partial state during reload.
      */
     public void loadAllSkins() {
         // Create new map for atomic replacement

@@ -38,7 +38,7 @@ public class NPCManager {
      * NPC config cache (NPC name -> NPC config)
      */
     @Getter
-    private final Map<String, NPCConfig> npcConfigs = new ConcurrentHashMap<>();
+    private volatile Map<String, NPCConfig> npcConfigs = new ConcurrentHashMap<>();
 
     /**
      * Spawned NPCs (NPC name -> NPC instance)
@@ -56,56 +56,67 @@ public class NPCManager {
     private final Map<String, Long> clickCooldowns = new ConcurrentHashMap<>();
 
     /**
-     * YAML parser
-     */
-    private final Yaml yaml;
-
-    /**
      * Create NPC manager
      *
      * @param npcsDirectory NPC directory path
      */
     public NPCManager(Path npcsDirectory) {
         this.npcsDirectory = npcsDirectory;
-
-        // Configure YAML output format
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setPrettyFlow(true);
-        this.yaml = new Yaml(options);
     }
 
     /**
-     * Load all NPC configs
+     * Create a new Yaml instance for thread-safe parsing.
+     *
+     * @return new Yaml instance
+     */
+    private Yaml createYaml() {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setPrettyFlow(true);
+        return new Yaml(options);
+    }
+
+    /**
+     * Load all NPC configs using atomic replacement pattern.
      */
     public void loadAllNPCConfigs() {
-        npcConfigs.clear();
+        // Create new map for atomic replacement
+        Map<String, NPCConfig> newConfigs = new ConcurrentHashMap<>();
 
         if (!Files.exists(npcsDirectory)) {
             log.warn("NPCs directory does not exist: {}", npcsDirectory);
+            // Atomically replace with empty map
+            this.npcConfigs = newConfigs;
             return;
         }
+
+        // Create method-local Yaml instance for thread safety
+        Yaml yaml = createYaml();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(npcsDirectory, "*.yml")) {
             for (Path path : stream) {
                 String fileName = path.getFileName().toString();
                 String npcName = fileName.replace(".yml", "");
-                loadNPCConfig(path, npcName);
+                loadNPCConfig(path, npcName, yaml, newConfigs);
             }
         } catch (IOException e) {
             log.error("Failed to load NPC configs from directory: {}", npcsDirectory, e);
         }
 
-        log.info("Loaded {} NPC configs", npcConfigs.size());
+        // Atomic replacement - other threads will see either old or new map, never empty
+        this.npcConfigs = newConfigs;
+        log.info("Loaded {} NPC configs", newConfigs.size());
     }
 
     /**
-     * Load a single NPC config from file
+     * Load a single NPC config from file into target map
      *
-     * @param path    config file path
-     * @param npcName NPC name
+     * @param path      config file path
+     * @param npcName   NPC name
+     * @param yaml      YAML parser instance
+     * @param targetMap target map to put config into
      */
-    private void loadNPCConfig(Path path, String npcName) {
+    private void loadNPCConfig(Path path, String npcName, Yaml yaml, Map<String, NPCConfig> targetMap) {
         try (InputStream inputStream = Files.newInputStream(path)) {
             Map<String, Object> data = yaml.load(inputStream);
             if (data == null) {
@@ -114,7 +125,7 @@ public class NPCManager {
             }
 
             NPCConfig config = parseNPCConfig(npcName, data);
-            npcConfigs.put(npcName, config);
+            targetMap.put(npcName, config);
             log.debug("Loaded NPC config: {}", npcName);
 
         } catch (IOException e) {
@@ -320,6 +331,8 @@ public class NPCManager {
 
         try (OutputStream outputStream = Files.newOutputStream(configFile);
              OutputStreamWriter writer = new OutputStreamWriter(outputStream)) {
+            // Create method-local Yaml instance for thread safety
+            Yaml yaml = createYaml();
             yaml.dump(data, writer);
             log.debug("Saved NPC config: {}", config.getName());
         } catch (IOException e) {

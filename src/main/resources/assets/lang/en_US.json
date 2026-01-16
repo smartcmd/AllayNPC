@@ -25,8 +25,6 @@
   "allaynpc:command.registered": "Registered /anpc command",
   "allaynpc:command.description": "AllayNPC management command",
   "allaynpc:event.registered": "Registered event listeners",
-  "allaynpc:task.started": "Started NPC update task (interval: %1 ticks)",
-  "allaynpc:npc.update.error": "Error updating NPC %1: %2",
 
   "allaynpc:command.npc.exists": "NPC '%1' already exists!",
   "allaynpc:command.npc.notfound": "NPC '%1' not found!",
@@ -127,6 +125,5 @@
   "allaynpc:form.action.delete": "Delete",
   "allaynpc:form.action.back": "Back",
 
-  "allaynpc:error.command.failed": "Command execution failed: %1",
-  "allaynpc:error.invalid.emote.uuid": "Invalid emote UUID for NPC '%1': %2"
+  "allaynpc:error.command.failed": "Command execution failed: %1"
 }
