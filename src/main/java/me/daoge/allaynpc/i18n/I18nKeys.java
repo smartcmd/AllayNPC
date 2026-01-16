@@ -83,6 +83,7 @@ public class I18nKeys {
     public static final String FORM_CREATE_DISPLAYNAME_PLACEHOLDER = "allaynpc:form.create.displayname.placeholder";
     public static final String FORM_CREATE_ALWAYSSHOWNAME = "allaynpc:form.create.alwaysshowname";
     public static final String FORM_CREATE_SKIN = "allaynpc:form.create.skin";
+    public static final String FORM_CREATE_CAPE = "allaynpc:form.create.cape";
     public static final String FORM_CREATE_LOOKATPLAYER = "allaynpc:form.create.lookatplayer";
     public static final String FORM_CREATE_HELDITEM = "allaynpc:form.create.helditem";
     public static final String FORM_CREATE_HELDITEM_PLACEHOLDER = "allaynpc:form.create.helditem.placeholder";
@@ -104,6 +105,9 @@ public class I18nKeys {
     // Form - Basic settings
     public static final String FORM_BASIC_TITLE = "allaynpc:form.basic.title";
     public static final String FORM_BASIC_UPDATED = "allaynpc:form.basic.updated";
+    public static final String FORM_BASIC_SCORETAG = "allaynpc:form.basic.scoretag";
+    public static final String FORM_BASIC_SCORETAG_PLACEHOLDER = "allaynpc:form.basic.scoretag.placeholder";
+    public static final String FORM_BASIC_SCALE = "allaynpc:form.basic.scale";
 
     // Form - Position
     public static final String FORM_POSITION_TITLE = "allaynpc:form.position.title";

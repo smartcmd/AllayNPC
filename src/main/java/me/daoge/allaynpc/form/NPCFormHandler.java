@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.daoge.allaynpc.AllayNPC;
 import me.daoge.allaynpc.config.NPCConfig;
 import me.daoge.allaynpc.i18n.I18nKeys;
+import me.daoge.allaynpc.manager.CapeManager;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.manager.SkinManager;
 import me.daoge.allaynpc.util.I18nUtil;
@@ -42,17 +43,24 @@ public class NPCFormHandler {
         Player actualPlayer = player.getController();
         var location = player.getLocation();
         SkinManager skinManager = AllayNPC.getInstance().getSkinManager();
+        CapeManager capeManager = AllayNPC.getInstance().getCapeManager();
 
         // Get skin list
         List<String> skinList = new ArrayList<>();
         skinList.add(""); // Default option: use default skin
         skinList.addAll(skinManager.getSkinNames());
 
+        // Get cape list
+        List<String> capeList = new ArrayList<>();
+        capeList.add(""); // Default option: no cape
+        capeList.addAll(capeManager.getCapeNames());
+
         CustomForm form = Forms.custom()
                 .title(I18nUtil.tr(player, I18nKeys.FORM_CREATE_TITLE, npcName))
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_DISPLAYNAME), I18nUtil.tr(player, I18nKeys.FORM_CREATE_DISPLAYNAME_PLACEHOLDER), npcName)
                 .toggle(I18nUtil.tr(player, I18nKeys.FORM_CREATE_ALWAYSSHOWNAME), true)
                 .dropdown(I18nUtil.tr(player, I18nKeys.FORM_CREATE_SKIN), skinList, 0)
+                .dropdown(I18nUtil.tr(player, I18nKeys.FORM_CREATE_CAPE), capeList, 0)
                 .toggle(I18nUtil.tr(player, I18nKeys.FORM_CREATE_LOOKATPLAYER), true)
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_HELDITEM), I18nUtil.tr(player, I18nKeys.FORM_CREATE_HELDITEM_PLACEHOLDER), "")
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_COOLDOWN), "20", "20")
@@ -63,9 +71,11 @@ public class NPCFormHandler {
                     boolean alwaysShowName = parseBoolean(responses.get(1), true);
                     int skinIndex = parseInt(responses.get(2), 0);
                     String skinName = (skinIndex > 0 && skinIndex < skinList.size()) ? skinList.get(skinIndex) : "";
-                    boolean lookAtPlayer = parseBoolean(responses.get(3), true);
-                    String heldItem = responses.get(4);
-                    int clickCooldown = parseInt(responses.get(5), 20);
+                    int capeIndex = parseInt(responses.get(3), 0);
+                    String capeName = (capeIndex > 0 && capeIndex < capeList.size()) ? capeList.get(capeIndex) : "";
+                    boolean lookAtPlayer = parseBoolean(responses.get(4), true);
+                    String heldItem = responses.get(5);
+                    int clickCooldown = parseInt(responses.get(6), 20);
 
                     // Create NPC config
                     NPCConfig config = NPCConfig.builder()
@@ -73,6 +83,7 @@ public class NPCFormHandler {
                             .displayName(displayName.isEmpty() ? npcName : displayName)
                             .alwaysShowName(alwaysShowName)
                             .skin(skinName)
+                            .cape(capeName)
                             .lookAtPlayer(lookAtPlayer)
                             .heldItem(heldItem)
                             .clickCooldown(clickCooldown)
@@ -148,6 +159,7 @@ public class NPCFormHandler {
         NPCManager npcManager = AllayNPC.getInstance().getNpcManager();
         NPCConfig config = npcManager.getNPCConfig(npcName);
         SkinManager skinManager = AllayNPC.getInstance().getSkinManager();
+        CapeManager capeManager = AllayNPC.getInstance().getCapeManager();
 
         if (config == null) return;
 
@@ -162,30 +174,51 @@ public class NPCFormHandler {
             if (idx >= 0) currentSkinIndex = idx;
         }
 
+        // Get cape list
+        List<String> capeList = new ArrayList<>();
+        capeList.add(""); // Default option: no cape
+        capeList.addAll(capeManager.getCapeNames());
+
+        int currentCapeIndex = 0;
+        if (config.getCape() != null && !config.getCape().isEmpty()) {
+            int idx = capeList.indexOf(config.getCape());
+            if (idx >= 0) currentCapeIndex = idx;
+        }
+
         CustomForm form = Forms.custom()
                 .title(I18nUtil.tr(player, I18nKeys.FORM_BASIC_TITLE, npcName))
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_DISPLAYNAME), I18nUtil.tr(player, I18nKeys.FORM_CREATE_DISPLAYNAME_PLACEHOLDER), config.getDisplayName())
                 .toggle(I18nUtil.tr(player, I18nKeys.FORM_CREATE_ALWAYSSHOWNAME), config.isAlwaysShowName())
                 .dropdown(I18nUtil.tr(player, I18nKeys.FORM_CREATE_SKIN), skinList, currentSkinIndex)
+                .dropdown(I18nUtil.tr(player, I18nKeys.FORM_CREATE_CAPE), capeList, currentCapeIndex)
                 .toggle(I18nUtil.tr(player, I18nKeys.FORM_CREATE_LOOKATPLAYER), config.isLookAtPlayer())
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_HELDITEM), I18nUtil.tr(player, I18nKeys.FORM_CREATE_HELDITEM_PLACEHOLDER), config.getHeldItem())
                 .input(I18nUtil.tr(player, I18nKeys.FORM_CREATE_COOLDOWN), "20", String.valueOf(config.getClickCooldown()))
+                .input(I18nUtil.tr(player, I18nKeys.FORM_BASIC_SCORETAG), I18nUtil.tr(player, I18nKeys.FORM_BASIC_SCORETAG_PLACEHOLDER), config.getScoreTag() != null ? config.getScoreTag() : "")
+                .input(I18nUtil.tr(player, I18nKeys.FORM_BASIC_SCALE), "1.0", String.valueOf(config.getScale()))
                 .onResponse(responses -> {
                     String displayName = responses.get(0);
                     boolean alwaysShowName = parseBoolean(responses.get(1), config.isAlwaysShowName());
                     int skinIndex = parseInt(responses.get(2), 0);
                     String skinName = (skinIndex > 0 && skinIndex < skinList.size()) ? skinList.get(skinIndex) : "";
-                    boolean lookAtPlayer = parseBoolean(responses.get(3), config.isLookAtPlayer());
-                    String heldItem = responses.get(4);
-                    int clickCooldown = parseInt(responses.get(5), config.getClickCooldown());
+                    int capeIndex = parseInt(responses.get(3), 0);
+                    String capeName = (capeIndex > 0 && capeIndex < capeList.size()) ? capeList.get(capeIndex) : "";
+                    boolean lookAtPlayer = parseBoolean(responses.get(4), config.isLookAtPlayer());
+                    String heldItem = responses.get(5);
+                    int clickCooldown = parseInt(responses.get(6), config.getClickCooldown());
+                    String scoreTag = responses.get(7);
+                    double scale = parseDouble(responses.get(8), config.getScale());
 
                     // Update config
                     config.setDisplayName(displayName.isEmpty() ? npcName : displayName);
                     config.setAlwaysShowName(alwaysShowName);
                     config.setSkin(skinName);
+                    config.setCape(capeName);
                     config.setLookAtPlayer(lookAtPlayer);
                     config.setHeldItem(heldItem);
                     config.setClickCooldown(clickCooldown);
+                    config.setScoreTag(scoreTag);
+                    config.setScale(scale);
 
                     // Save config
                     npcManager.saveNPCConfig(config);
@@ -503,6 +536,19 @@ public class NPCFormHandler {
         try {
             if (value instanceof Number n) return n.intValue();
             return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Safely parse double from form response
+     */
+    private static double parseDouble(Object value, double defaultValue) {
+        if (value == null) return defaultValue;
+        try {
+            if (value instanceof Number n) return n.doubleValue();
+            return Double.parseDouble(value.toString());
         } catch (NumberFormatException e) {
             return defaultValue;
         }

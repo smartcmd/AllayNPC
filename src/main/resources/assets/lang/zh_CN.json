@@ -63,6 +63,7 @@
   "allaynpc:form.create.displayname.placeholder": "输入显示名称...",
   "allaynpc:form.create.alwaysshowname": "始终显示名称",
   "allaynpc:form.create.skin": "皮肤",
+  "allaynpc:form.create.cape": "披风",
   "allaynpc:form.create.lookatplayer": "看向玩家",
   "allaynpc:form.create.helditem": "手持物品 ID",
   "allaynpc:form.create.helditem.placeholder": "例如 minecraft:diamond_sword",
@@ -82,6 +83,9 @@
 
   "allaynpc:form.basic.title": "编辑基本设置: %1",
   "allaynpc:form.basic.updated": "基本设置已更新！",
+  "allaynpc:form.basic.scoretag": "分数标签",
+  "allaynpc:form.basic.scoretag.placeholder": "例如 &7在线: &a{online}",
+  "allaynpc:form.basic.scale": "缩放（1.0 = 正常）",
 
   "allaynpc:form.position.title": "编辑位置: %1",
   "allaynpc:form.position.current": "当前位置：\n世界: %1\nX: %2, Y: %3, Z: %4\n偏航: %5, 俯仰: %6",

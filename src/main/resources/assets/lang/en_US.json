@@ -63,6 +63,7 @@
   "allaynpc:form.create.displayname.placeholder": "Enter display name...",
   "allaynpc:form.create.alwaysshowname": "Always Show Name",
   "allaynpc:form.create.skin": "Skin",
+  "allaynpc:form.create.cape": "Cape",
   "allaynpc:form.create.lookatplayer": "Look at Player",
   "allaynpc:form.create.helditem": "Held Item ID",
   "allaynpc:form.create.helditem.placeholder": "e.g. minecraft:diamond_sword",
@@ -82,6 +83,9 @@
 
   "allaynpc:form.basic.title": "Edit Basic Settings: %1",
   "allaynpc:form.basic.updated": "Basic settings updated!",
+  "allaynpc:form.basic.scoretag": "Score Tag",
+  "allaynpc:form.basic.scoretag.placeholder": "e.g. &7Online: &a{online}",
+  "allaynpc:form.basic.scale": "Scale (1.0 = normal)",
 
   "allaynpc:form.position.title": "Edit Position: %1",
   "allaynpc:form.position.current": "Current Position:\nWorld: %1\nX: %2, Y: %3, Z: %4\nYaw: %5, Pitch: %6",
