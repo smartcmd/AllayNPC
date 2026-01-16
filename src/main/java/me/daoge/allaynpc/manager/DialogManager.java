@@ -16,11 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Dialog Manager
  * Responsible for loading, caching and managing dialog configs
- * <p>
- * Thread-safety: This class uses atomic replacement for reload operations.
- * During reload, a new map is populated and then atomically swapped with the old one.
- * This ensures other threads always see either the complete old state or complete new state,
- * never an intermediate state.
  *
  * @author daoge_cmd
  */

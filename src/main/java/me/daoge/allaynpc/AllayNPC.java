@@ -9,7 +9,6 @@ import me.daoge.allaynpc.manager.CapeManager;
 import me.daoge.allaynpc.manager.DialogManager;
 import me.daoge.allaynpc.manager.NPCManager;
 import me.daoge.allaynpc.manager.SkinManager;
-import me.daoge.allaynpc.npc.NPC;
 import org.allaymc.api.message.I18n;
 import org.allaymc.api.plugin.Plugin;
 import org.allaymc.api.registry.Registries;
@@ -22,6 +21,10 @@ import java.nio.file.Path;
 /**
  * AllayNPC - Main plugin class
  * Provides complete NPC creation, management and interaction functionality for AllayMC
+ * <p>
+ * Thread-safety: Each NPC schedules its own update task on its dimension's scheduler,
+ * ensuring all NPC updates run on the same thread as world events. This avoids race
+ * conditions between the server thread and world threads.
  *
  * @author daoge_cmd
  */
@@ -29,9 +32,9 @@ import java.nio.file.Path;
 public class AllayNPC extends Plugin {
 
     /**
-     * NPC tick update interval in ticks (1 ticks = 50ms)
+     * Cooldown cleanup interval in ticks (1 minute = 1200 ticks)
      */
-    private static final int NPC_UPDATE_INTERVAL = 1;
+    private static final int COOLDOWN_CLEANUP_INTERVAL = 1200;
 
     @Getter
     private static AllayNPC instance;
@@ -50,11 +53,6 @@ public class AllayNPC extends Plugin {
 
     @Getter
     private NPCEventListener eventListener;
-
-    /**
-     * Current server tick counter
-     */
-    private long currentTick = 0;
 
     @Override
     public void onLoad() {
@@ -78,8 +76,8 @@ public class AllayNPC extends Plugin {
         // Register event listeners
         registerEventListeners();
 
-        // Start NPC update task
-        startNPCUpdateTask();
+        // Start cooldown cleanup task
+        startCooldownCleanupTask();
 
         // Spawn NPCs for already loaded worlds
         spawnNPCsForLoadedWorlds();
@@ -184,15 +182,17 @@ public class AllayNPC extends Plugin {
     }
 
     /**
-     * Start NPC update task for look-at-player and emotes
+     * Start cooldown cleanup task.
+     * This task runs on the server scheduler to periodically clean up expired click cooldowns.
+     * Note: NPC update tasks (look-at-player, emotes, etc.) are now scheduled per-NPC
+     * on each NPC's dimension scheduler for thread safety.
      */
-    private void startNPCUpdateTask() {
-        Server.getInstance().getScheduler().scheduleRepeating(this, () -> {
-            currentTick += NPC_UPDATE_INTERVAL;
-            updateNPCs();
-        }, NPC_UPDATE_INTERVAL);
+    private void startCooldownCleanupTask() {
+        Server.getInstance().getScheduler().scheduleRepeating(this,
+                () -> npcManager.cleanupCooldowns(),
+                COOLDOWN_CLEANUP_INTERVAL);
 
-        log.info(I18n.get().tr(I18nKeys.TASK_STARTED, NPC_UPDATE_INTERVAL));
+        log.debug("Started cooldown cleanup task (interval: {} ticks)", COOLDOWN_CLEANUP_INTERVAL);
     }
 
     /**
@@ -206,46 +206,12 @@ public class AllayNPC extends Plugin {
     }
 
     /**
-     * Update all NPCs (look-at-player, emotes, and score tags)
-     */
-    private void updateNPCs() {
-        for (NPC npc : npcManager.getSpawnedNPCs()) {
-            try {
-                // Update look-at-player
-                npc.lookAtNearestPlayer();
-
-                // Check and play emotes
-                if (npc.shouldPlayEmote(currentTick)) {
-                    npc.playEmote();
-                }
-
-                // Update display name and score tags every second (20 ticks) for PAPI support
-                if (currentTick % 20 == 0) {
-                    if (npc.hasDisplayNamePlaceholders()) {
-                        npc.updateDisplayName();
-                    }
-                    if (npc.hasScoreTag()) {
-                        npc.updateScoreTag();
-                    }
-                }
-            } catch (Exception e) {
-                log.warn(I18n.get().tr(I18nKeys.NPC_UPDATE_ERROR, npc.getName(), e.getMessage()));
-            }
-        }
-
-        // Cleanup expired cooldowns every minute (1200 ticks)
-        if (currentTick % 1200 == 0) {
-            npcManager.cleanupCooldowns();
-        }
-    }
-
-    /**
      * Reload plugin configuration
      */
     public void reload() {
         log.info(I18n.get().tr(I18nKeys.PLUGIN_RELOADING));
 
-        // Remove all NPCs
+        // Remove all NPCs (this will cancel their dimension scheduler tasks)
         npcManager.removeAllNPCs();
 
         // Reload skins
@@ -264,7 +230,7 @@ public class AllayNPC extends Plugin {
         npcManager.loadAllNPCConfigs();
         log.info(I18n.get().tr(I18nKeys.MANAGER_NPCS_RELOADED, npcManager.getNPCConfigCount()));
 
-        // Respawn all NPCs
+        // Respawn all NPCs (each NPC will start its own dimension scheduler task)
         npcManager.spawnAllNPCs();
 
         log.info(I18n.get().tr(I18nKeys.PLUGIN_RELOADED));

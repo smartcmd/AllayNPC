@@ -9,12 +9,12 @@ import org.allaymc.api.container.ContainerTypes;
 import org.allaymc.api.entity.EntityInitInfo;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.entity.type.EntityTypes;
-import org.allaymc.api.player.Player;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.math.MathUtils;
 import org.allaymc.api.math.location.Location3d;
 import org.allaymc.api.math.location.Location3dc;
 import org.allaymc.api.player.GameMode;
+import org.allaymc.api.player.Player;
 import org.allaymc.api.player.Skin;
 import org.allaymc.api.registry.Registries;
 import org.allaymc.api.server.Server;
@@ -22,8 +22,8 @@ import org.allaymc.api.utils.TextFormat;
 import org.allaymc.api.utils.identifier.Identifier;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.api.world.World;
-import org.allaymc.api.world.chunk.FakeChunkLoader;
 import org.allaymc.api.world.WorldViewer;
+import org.allaymc.api.world.chunk.FakeChunkLoader;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 
@@ -40,6 +40,16 @@ import java.util.UUID;
 @Slf4j
 @Getter
 public class NPC {
+
+    /**
+     * NPC update interval in ticks
+     */
+    private static final int UPDATE_INTERVAL = 1;
+
+    /**
+     * PAPI update interval in ticks (every second)
+     */
+    private static final int PAPI_UPDATE_INTERVAL = 20;
 
     /**
      * NPC configuration
@@ -60,6 +70,11 @@ public class NPC {
      * Last emote play time (tick)
      */
     private long lastEmoteTick = 0;
+
+    /**
+     * Internal tick counter for this NPC
+     */
+    private long tickCounter = 0;
 
     /**
      * Create NPC
@@ -149,6 +164,9 @@ public class NPC {
             chunkLoader = new FakeChunkLoader(entity::getLocation, 1);
             dimension.getChunkManager().addChunkLoader(chunkLoader);
 
+            // Start update task on entity's scheduler
+            startUpdateTask();
+
             return true;
 
         } catch (Exception e) {
@@ -156,6 +174,43 @@ public class NPC {
             // Rollback: clean up any partially initialized resources
             cleanupFailedSpawn(dimension);
             return false;
+        }
+    }
+
+    /**
+     * Start the NPC update task on the entity's scheduler.
+     * Handles look-at-player, emotes, and PAPI placeholder updates.
+     */
+    private void startUpdateTask() {
+        entity.getScheduler().scheduleRepeating(entity, this::tick, UPDATE_INTERVAL);
+    }
+
+    /**
+     * NPC tick method, called by the entity scheduler.
+     */
+    private void tick() {
+        tickCounter += UPDATE_INTERVAL;
+
+        try {
+            // Update look-at-player
+            lookAtNearestPlayer();
+
+            // Check and play emotes
+            if (shouldPlayEmote(tickCounter)) {
+                playEmote();
+            }
+
+            // Update display name and score tags every second for PAPI support
+            if (tickCounter % PAPI_UPDATE_INTERVAL == 0) {
+                if (hasDisplayNamePlaceholders()) {
+                    updateDisplayName();
+                }
+                if (hasScoreTag()) {
+                    updateScoreTag();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Error during NPC {} tick: {}", config.getName(), e.getMessage());
         }
     }
 
