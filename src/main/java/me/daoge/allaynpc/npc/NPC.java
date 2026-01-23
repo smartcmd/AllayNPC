@@ -470,8 +470,7 @@ public class NPC {
         try {
             UUID emoteUuid = UUID.fromString(emoteConfig.getId());
             // Send emote to viewers only
-            // TODO: set silence to true when allay-api is bumped to 0.23.0
-            entity.forEachViewers(viewer -> viewer.viewPlayerEmote(entity, emoteUuid));
+            entity.forEachViewers(viewer -> viewer.viewPlayerEmote(entity, emoteUuid, true));
         } catch (IllegalArgumentException e) {
             log.warn("Invalid emote UUID for NPC {}: {}", config.getName(), emoteConfig.getId());
         }
