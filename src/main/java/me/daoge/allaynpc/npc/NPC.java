@@ -538,7 +538,7 @@ public class NPC {
                 );
 
                 // Send individualized location to this viewer only
-                player.viewEntityLocation(entity, new Location3d(npcLoc), viewLocation, false);
+                player.viewEntityLocation(entity, viewLocation, false);
 
             } catch (Exception e) {
                 log.warn("Failed to update look direction for viewer {} on NPC {}", player.getOriginName(), config.getName(), e);
